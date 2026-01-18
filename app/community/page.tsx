@@ -132,11 +132,10 @@ export default function CommunityPage() {
                 <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={() => setSelectedCategory('all')}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                      selectedCategory === 'all'
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${selectedCategory === 'all'
                         ? 'bg-primary text-primary-foreground'
                         : 'hover:bg-muted'
-                    }`}
+                      }`}
                   >
                     All
                   </button>
@@ -144,11 +143,10 @@ export default function CommunityPage() {
                     <button
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition capitalize ${
-                        selectedCategory === cat
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition capitalize ${selectedCategory === cat
                           ? 'bg-primary text-primary-foreground'
                           : 'hover:bg-muted'
-                      }`}
+                        }`}
                     >
                       {cat}
                     </button>
@@ -176,15 +174,14 @@ export default function CommunityPage() {
                           {Math.floor((Date.now() - post.createdAt.getTime()) / (1000 * 60 * 60))} hours ago
                         </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
-                        post.category === 'question'
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${post.category === 'question'
                           ? 'bg-blue-500/10 text-blue-500'
                           : post.category === 'solution'
                             ? 'bg-green-500/10 text-green-500'
                             : post.category === 'resource'
                               ? 'bg-purple-500/10 text-purple-500'
                               : 'bg-amber-500/10 text-amber-500'
-                      }`}>
+                        }`}>
                         {post.category}
                       </span>
                     </div>
@@ -301,6 +298,7 @@ export default function CommunityPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </Suspense>
   );

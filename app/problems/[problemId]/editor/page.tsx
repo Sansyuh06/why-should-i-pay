@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import Link from 'next/link';
 import { sampleProblems } from '@/lib/data';
 import { ProblemNotFoundState } from '@/components/error-states';
@@ -39,8 +39,9 @@ int main() {
 }`
 };
 
-export default function CodeEditorPage({ params }: { params: { problemId: string } }) {
-  const problem = sampleProblems.find(p => p.id === params.problemId);
+export default function CodeEditorPage({ params }: { params: Promise<{ problemId: string }> }) {
+  const { problemId } = use(params);
+  const problem = sampleProblems.find(p => p.id === problemId);
   const [language, setLanguage] = useState<string>('javascript');
   const [code, setCode] = useState(codeTemplates.javascript);
   const [output, setOutput] = useState<string>('');
@@ -48,13 +49,13 @@ export default function CodeEditorPage({ params }: { params: { problemId: string
   const [status, setStatus] = useState<'idle' | 'submitted' | 'accepted'>('idle');
   const [copied, setCopied] = useState(false);
 
-  if (!problem) {
+  if(!problem) {
     // Get other problems as suggestions
     const suggestedProblems = sampleProblems
-      .filter(p => p.id !== params.problemId)
+      .filter(p => p.id !== problemId)
       .slice(0, 3);
 
-    return <ProblemNotFoundState problemId={params.problemId} suggestedProblems={suggestedProblems} />;
+    return <ProblemNotFoundState problemId={problemId} suggestedProblems={suggestedProblems} />;
   }
 
   const handleLanguageChange = (newLang: string) => {
@@ -106,13 +107,12 @@ export default function CodeEditorPage({ params }: { params: { problemId: string
             {/* Problem Info */}
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <span className={`font-bold px-3 py-1 rounded text-sm ${
-                  problem.difficulty === 'easy'
-                    ? 'bg-green-500/10 text-green-500'
-                    : problem.difficulty === 'medium'
-                      ? 'bg-yellow-500/10 text-yellow-500'
-                      : 'bg-red-500/10 text-red-500'
-                }`}>
+                <span className={`font-bold px-3 py-1 rounded text-sm ${problem.difficulty === 'easy'
+                  ? 'bg-green-500/10 text-green-500'
+                  : problem.difficulty === 'medium'
+                    ? 'bg-yellow-500/10 text-yellow-500'
+                    : 'bg-red-500/10 text-red-500'
+                  }`}>
                   {problem.difficulty}
                 </span>
                 <span className="text-sm text-muted-foreground">{problem.acceptance}% acceptance</span>
@@ -168,11 +168,10 @@ export default function CodeEditorPage({ params }: { params: { problemId: string
                   <button
                     key={lang}
                     onClick={() => handleLanguageChange(lang)}
-                    className={`py-2 px-3 rounded text-sm font-medium transition ${
-                      language === lang
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted hover:bg-muted/80'
-                    }`}
+                    className={`py-2 px-3 rounded text-sm font-medium transition ${language === lang
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted hover:bg-muted/80'
+                      }`}
                   >
                     {lang}
                   </button>

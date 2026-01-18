@@ -353,29 +353,98 @@ export const resources = {
   ]
 };
 
+// Create topic objects for learning paths
+const topicMap: Record<string, { id: string; name: string; description: string; subtopics: string[]; estimatedTime: number }> = {
+  'arrays': {
+    id: 'arrays',
+    name: 'Arrays & Strings',
+    description: 'Master arrays, strings, and manipulation techniques',
+    subtopics: ['Array basics', 'Two-pointer technique', 'Sliding window', 'String manipulation', 'Prefix sum'],
+    estimatedTime: 900 // 15 hours in minutes
+  },
+  'linked-lists': {
+    id: 'linked-lists',
+    name: 'Linked Lists',
+    description: 'Master linked list operations and techniques',
+    subtopics: ['Singly linked lists', 'Doubly linked lists', 'Fast and slow pointers', 'Cycle detection'],
+    estimatedTime: 720 // 12 hours in minutes
+  },
+  'trees': {
+    id: 'trees',
+    name: 'Trees & BST',
+    description: 'Master tree structures and traversals',
+    subtopics: ['Binary tree basics', 'BST operations', 'Tree traversals', 'Tree manipulation', 'Balanced trees'],
+    estimatedTime: 1080 // 18 hours in minutes
+  },
+  'graphs': {
+    id: 'graphs',
+    name: 'Graphs',
+    description: 'Master graph algorithms and traversals',
+    subtopics: ['Graph representation', 'BFS and DFS', 'Shortest paths', 'Topological sorting'],
+    estimatedTime: 1200 // 20 hours in minutes
+  },
+  'dynamic-programming': {
+    id: 'dynamic-programming',
+    name: 'Dynamic Programming',
+    description: 'Master DP patterns and optimization',
+    subtopics: ['DP fundamentals', 'Memoization', '0/1 Knapsack', 'LIS', 'Coin change'],
+    estimatedTime: 1500 // 25 hours in minutes
+  }
+};
+
 export const learningPaths = [
   {
     id: 'beginner-90',
+    name: 'Beginner - 90 Day Plan',
     title: 'Beginner - 90 Day Plan',
-    duration: 90,
-    topics: ['arrays', 'linked-lists'],
+    duration: 12, // weeks
+    difficulty: 'beginner' as const,
+    topics: [topicMap['arrays'], topicMap['linked-lists']],
     description: 'Start your DSA journey. Learn fundamentals before advanced concepts.',
-    dailyHours: 2
+    dailyHours: 2,
+    progression: 0,
+    goals: [
+      'Understand core data structures',
+      'Master array manipulation',
+      'Learn linked list operations',
+      'Build problem-solving intuition',
+      'Complete 50+ practice problems'
+    ]
   },
   {
     id: 'interview-120',
+    name: 'Interview Prep - 120 Day Plan',
     title: 'Interview Prep - 120 Day Plan',
-    duration: 120,
-    topics: ['arrays', 'linked-lists', 'trees', 'graphs', 'dynamic-programming'],
+    duration: 17, // weeks
+    difficulty: 'intermediate' as const,
+    topics: [topicMap['arrays'], topicMap['linked-lists'], topicMap['trees'], topicMap['graphs'], topicMap['dynamic-programming']],
     description: 'Complete interview preparation covering all important DSA topics.',
-    dailyHours: 3
+    dailyHours: 3,
+    progression: 0,
+    goals: [
+      'Master all core DSA topics',
+      'Solve 200+ interview problems',
+      'Learn company-specific patterns',
+      'Practice timed problem solving',
+      'Build interview confidence'
+    ]
   },
   {
     id: 'advanced-complete',
+    name: 'Complete Mastery - 180+ Days',
     title: 'Complete Mastery - 180+ Days',
-    duration: 180,
-    topics: ['arrays', 'linked-lists', 'trees', 'graphs', 'dynamic-programming'],
+    duration: 26, // weeks
+    difficulty: 'advanced' as const,
+    topics: [topicMap['arrays'], topicMap['linked-lists'], topicMap['trees'], topicMap['graphs'], topicMap['dynamic-programming']],
     description: 'Master every DSA concept at an expert level.',
-    dailyHours: 4
+    dailyHours: 4,
+    progression: 0,
+    goals: [
+      'Achieve expert-level mastery',
+      'Solve 400+ challenging problems',
+      'Master advanced algorithms',
+      'Contribute to open source',
+      'Teach and mentor others'
+    ]
   }
 ];

@@ -13,14 +13,14 @@ export function LoadingState({ message = 'Loading...' }: { message?: string }) {
   );
 }
 
-export function EmptyState({ 
-  title, 
-  description, 
+export function EmptyState({
+  title,
+  description,
   action,
   actionLabel = 'Go Home'
-}: { 
-  title: string; 
-  description: string; 
+}: {
+  title: string;
+  description: string;
   action?: string;
   actionLabel?: string;
 }) {
@@ -32,14 +32,14 @@ export function EmptyState({
           <p className="text-muted-foreground leading-relaxed">{description}</p>
         </div>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link 
-            href={action || '/'} 
+          <Link
+            href={action || '/'}
             className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
           >
             {actionLabel}
           </Link>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
           >
             Home
@@ -50,14 +50,14 @@ export function EmptyState({
   );
 }
 
-export function ErrorState({ 
+export function ErrorState({
   title = 'Oops, something went wrong',
   description = 'We encountered an error loading this content. Please try again or return home.',
   action = '/',
   actionLabel = 'Try Again'
-}: { 
-  title?: string; 
-  description?: string; 
+}: {
+  title?: string;
+  description?: string;
   action?: string;
   actionLabel?: string;
 }) {
@@ -70,14 +70,14 @@ export function ErrorState({
           <p className="text-muted-foreground leading-relaxed">{description}</p>
         </div>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link 
-            href={action} 
+          <Link
+            href={action}
             className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
           >
             {actionLabel}
           </Link>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
           >
             Home
@@ -88,12 +88,12 @@ export function ErrorState({
   );
 }
 
-export function NoResultsState({ 
+export function NoResultsState({
   title = 'No Results Found',
   description = 'We couldn\'t find what you\'re looking for. Try adjusting your filters or search terms.',
   actionLabel = 'Clear Filters'
-}: { 
-  title?: string; 
+}: {
+  title?: string;
   description?: string;
   actionLabel?: string;
 }) {
@@ -109,10 +109,10 @@ export function NoResultsState({
   );
 }
 
-export function ContentNotFoundState({ 
+export function ContentNotFoundState({
   item = 'Content',
   suggestion = 'Start from the main learning page to explore available topics and problems.'
-}: { 
+}: {
   item?: string;
   suggestion?: string;
 }) {
@@ -124,14 +124,14 @@ export function ContentNotFoundState({
           <p className="text-muted-foreground leading-relaxed">{suggestion}</p>
         </div>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link 
-            href="/learn" 
+          <Link
+            href="/learn"
             className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
           >
             Browse Topics
           </Link>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
           >
             Home
@@ -142,12 +142,12 @@ export function ContentNotFoundState({
   );
 }
 
-export function TopicNotFoundState({ 
+export function TopicNotFoundState({
   topicId,
   suggestedTopics = []
-}: { 
+}: {
   topicId?: string;
-  suggestedTopics?: Array<{ id: string; title: string; difficulty: string }>;
+  suggestedTopics?: Array<{ id: string; title?: string; name?: string; difficulty: string }>;
 }) {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-8">
@@ -168,15 +168,14 @@ export function TopicNotFoundState({
                 {suggestedTopics.slice(0, 4).map(topic => (
                   <Link key={topic.id} href={`/learn/${topic.id}`}>
                     <div className="border border-border/30 p-4 md:p-6 hover:border-border/60 transition-all duration-300 group cursor-pointer text-left">
-                      <h3 className="font-black mb-2 group-hover:translate-x-1 transition-transform duration-300">{topic.title}</h3>
+                      <h3 className="font-black mb-2 group-hover:translate-x-1 transition-transform duration-300">{topic.title || topic.name}</h3>
                       <div className="text-xs text-muted-foreground">
-                        <span className={`inline-block px-2 py-1 rounded ${
-                          topic.difficulty === 'Beginner'
+                        <span className={`inline-block px-2 py-1 rounded ${topic.difficulty === 'Beginner'
                             ? 'bg-green-500/10 text-green-600 dark:text-green-400'
                             : topic.difficulty === 'Intermediate'
-                            ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                            : 'bg-red-500/10 text-red-600 dark:text-red-400'
-                        }`}>
+                              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                          }`}>
                           {topic.difficulty}
                         </span>
                       </div>
@@ -188,14 +187,14 @@ export function TopicNotFoundState({
           )}
 
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link 
-              href="/learn" 
+            <Link
+              href="/learn"
               className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
             >
               Browse All Topics
             </Link>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
             >
               Home
@@ -207,10 +206,10 @@ export function TopicNotFoundState({
   );
 }
 
-export function ProblemNotFoundState({ 
+export function ProblemNotFoundState({
   problemId,
   suggestedProblems = []
-}: { 
+}: {
   problemId?: string;
   suggestedProblems?: Array<{ id: string; title: string; difficulty: string }>;
 }) {
@@ -237,13 +236,12 @@ export function ProblemNotFoundState({
                         <h3 className="font-black group-hover:translate-x-1 transition-transform duration-300">{problem.title}</h3>
                       </div>
                       <div className="text-xs text-muted-foreground flex-shrink-0 ml-4">
-                        <span className={`inline-block px-2 py-1 rounded ${
-                          problem.difficulty === 'easy'
+                        <span className={`inline-block px-2 py-1 rounded ${problem.difficulty === 'easy'
                             ? 'bg-green-500/10 text-green-600 dark:text-green-400'
                             : problem.difficulty === 'medium'
-                            ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                            : 'bg-red-500/10 text-red-600 dark:text-red-400'
-                        }`}>
+                              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                          }`}>
                           {problem.difficulty}
                         </span>
                       </div>
@@ -255,14 +253,14 @@ export function ProblemNotFoundState({
           )}
 
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link 
-              href="/problems" 
+            <Link
+              href="/problems"
               className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
             >
               Browse All Problems
             </Link>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
             >
               Home

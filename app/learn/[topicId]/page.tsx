@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { dsaTopics, sampleProblems } from '@/lib/data';
 import { TopicNotFoundState } from '@/components/error-states';
@@ -9,9 +9,10 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, Code2, Video, FileText, CheckCircle2, ChevronRight } from 'lucide-react';
 
-export default function TopicDetailPage({ params }: { params: { topicId: string } }) {
+export default function TopicDetailPage({ params }: { params: Promise<{ topicId: string }> }) {
+  const { topicId } = use(params);
   const [allTopics, setAllTopics] = useState<any[]>([]);
-  const topic = dsaTopics.find(t => t.id === params.topicId);
+  const topic = dsaTopics.find(t => t.id === topicId);
   const [activeSubtopic, setActiveSubtopic] = useState(0);
 
   useEffect(() => {
@@ -19,19 +20,19 @@ export default function TopicDetailPage({ params }: { params: { topicId: string 
     setAllTopics(dsaTopics);
   }, []);
 
-  if (!topic) {
+  if(!topic) {
     // Get other topics as suggestions, excluding similar IDs
     const suggestedTopics = dsaTopics
-      .filter(t => t.id !== params.topicId)
+      .filter(t => t.id !== topicId)
       .slice(0, 4);
 
-    return <TopicNotFoundState topicId={params.topicId} suggestedTopics={suggestedTopics} />;
+    return <TopicNotFoundState topicId={topicId} suggestedTopics={suggestedTopics} />;
   }
 
   const subtopic = topic.subtopics?.[activeSubtopic];
 
   const getResourceIcon = (type: string) => {
-    switch (type) {
+    switch(type) {
       case 'video':
         return <Video className="w-4 h-4" />;
       case 'article':
@@ -44,7 +45,7 @@ export default function TopicDetailPage({ params }: { params: { topicId: string 
   };
 
   // Safe access to subtopic with fallback
-  if (!subtopic) {
+  if(!subtopic) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-8">
         <div className="text-center space-y-6 max-w-md">
@@ -55,14 +56,14 @@ export default function TopicDetailPage({ params }: { params: { topicId: string 
             </p>
           </div>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link 
-              href="/learn" 
+            <Link
+              href="/learn"
               className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
             >
               Browse Topics
             </Link>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
             >
               Home
@@ -104,11 +105,10 @@ export default function TopicDetailPage({ params }: { params: { topicId: string 
                   <button
                     key={sub.id}
                     onClick={() => setActiveSubtopic(idx)}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                      activeSubtopic === idx
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-muted'
-                    }`}
+                    className={`w-full text-left px-4 py-3 rounded-lg transition ${activeSubtopic === idx
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       {sub.completed ? (
@@ -195,13 +195,12 @@ export default function TopicDetailPage({ params }: { params: { topicId: string 
                                 </p>
                                 <div className="flex items-center gap-2 mt-3 flex-wrap">
                                   <span
-                                    className={`px-2 py-1 text-xs font-bold rounded ${
-                                      problem.difficulty === 'easy'
-                                        ? 'bg-green-500/10 text-green-500'
-                                        : problem.difficulty === 'medium'
-                                          ? 'bg-yellow-500/10 text-yellow-500'
-                                          : 'bg-red-500/10 text-red-500'
-                                    }`}
+                                    className={`px-2 py-1 text-xs font-bold rounded ${problem.difficulty === 'easy'
+                                      ? 'bg-green-500/10 text-green-500'
+                                      : problem.difficulty === 'medium'
+                                        ? 'bg-yellow-500/10 text-yellow-500'
+                                        : 'bg-red-500/10 text-red-500'
+                                      }`}
                                   >
                                     {problem.difficulty}
                                   </span>

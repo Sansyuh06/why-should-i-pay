@@ -1,5 +1,6 @@
 'use client';
 
+import { use } from 'react';
 import Link from 'next/link';
 import { sampleProblems } from '@/lib/data';
 import { ProblemNotFoundState } from '@/components/error-states';
@@ -8,16 +9,17 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, MessageCircle, Share2, BookmarkIcon } from 'lucide-react';
 
-export default function ProblemPage({ params }: { params: { problemId: string } }) {
-  const problem = sampleProblems.find(p => p.id === params.problemId);
+export default function ProblemPage({ params }: { params: Promise<{ problemId: string }> }) {
+  const { problemId } = use(params);
+  const problem = sampleProblems.find(p => p.id === problemId);
 
-  if (!problem) {
+  if(!problem) {
     // Get other problems as suggestions
     const suggestedProblems = sampleProblems
-      .filter(p => p.id !== params.problemId)
+      .filter(p => p.id !== problemId)
       .slice(0, 3);
 
-    return <ProblemNotFoundState problemId={params.problemId} suggestedProblems={suggestedProblems} />;
+    return <ProblemNotFoundState problemId={problemId} suggestedProblems={suggestedProblems} />;
   }
 
   return (
@@ -32,13 +34,12 @@ export default function ProblemPage({ params }: { params: { problemId: string } 
             <div>
               <h1 className="text-3xl font-bold mb-2">{problem.title}</h1>
               <div className="flex items-center gap-4 flex-wrap">
-                <span className={`font-bold px-3 py-1 rounded text-sm ${
-                  problem.difficulty === 'easy'
-                    ? 'bg-green-500/10 text-green-500'
-                    : problem.difficulty === 'medium'
-                      ? 'bg-yellow-500/10 text-yellow-500'
-                      : 'bg-red-500/10 text-red-500'
-                }`}>
+                <span className={`font-bold px-3 py-1 rounded text-sm ${problem.difficulty === 'easy'
+                  ? 'bg-green-500/10 text-green-500'
+                  : problem.difficulty === 'medium'
+                    ? 'bg-yellow-500/10 text-yellow-500'
+                    : 'bg-red-500/10 text-red-500'
+                  }`}>
                   {problem.difficulty.toUpperCase()}
                 </span>
                 <span className="text-sm text-muted-foreground">{problem.acceptance}% acceptance rate</span>
@@ -167,13 +168,12 @@ export default function ProblemPage({ params }: { params: { problemId: string } 
                   <h3 className="font-bold hover:text-primary transition">{p.title}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{p.description.substring(0, 80)}...</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                      p.difficulty === 'easy'
-                        ? 'bg-green-500/10 text-green-500'
-                        : p.difficulty === 'medium'
-                          ? 'bg-yellow-500/10 text-yellow-500'
-                          : 'bg-red-500/10 text-red-500'
-                    }`}>
+                    <span className={`text-xs font-bold px-2 py-1 rounded ${p.difficulty === 'easy'
+                      ? 'bg-green-500/10 text-green-500'
+                      : p.difficulty === 'medium'
+                        ? 'bg-yellow-500/10 text-yellow-500'
+                        : 'bg-red-500/10 text-red-500'
+                      }`}>
                       {p.difficulty}
                     </span>
                     <span className="text-xs text-muted-foreground">{p.acceptance}% accept rate</span>
