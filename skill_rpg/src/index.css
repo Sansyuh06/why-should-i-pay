@@ -1,0 +1,277 @@
+:root {
+  /* Colors */
+  --bg-dark: #0f172a;
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --bg-card-hover: rgba(15, 23, 42, 0.8);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-emerald: #10b981;
+  --accent-cyan: #06b6d4;
+  --accent-violet: #8b5cf6;
+  --accent-amber: #f59e0b;
+
+  /* Borders */
+  --border-color: #334155;
+  --border-active: #94a3b8;
+
+  /* Spacing */
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+
+  /* Misc */
+  --radius: 12px;
+  --font-main: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Background Grid Effect */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.9) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.9) 2px, transparent 2px);
+  background-size: 30px 30px;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Desktop visibility helper - simple approach */
+@media (min-width: 1024px) {
+  .lg-block {
+    display: block;
+  }
+
+  .lg-hidden {
+    display: none;
+  }
+}
+
+/* Components */
+.cyber-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.cyber-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.cyber-btn:active {
+  transform: scale(0.98);
+}
+
+/* Theme Variations */
+.theme-emerald {
+  --theme-color: var(--accent-emerald);
+}
+
+.theme-cyan {
+  --theme-color: var(--accent-cyan);
+}
+
+.theme-violet {
+  --theme-color: var(--accent-violet);
+}
+
+.theme-amber {
+  --theme-color: var(--accent-amber);
+}
+
+.text-theme {
+  color: var(--theme-color);
+}
+
+.bg-theme {
+  background-color: var(--theme-color);
+}
+
+.border-theme {
+  border-color: var(--theme-color);
+}
+
+.cyber-btn.btn-theme {
+  background-color: var(--theme-color);
+  box-shadow: 0 0 10px var(--theme-color);
+}
+
+.cyber-btn.btn-theme:hover {
+  filter: brightness(1.2);
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-spin {
+  animation: spin 10s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin 15s linear infinite reverse;
+}
+
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Skill Node Styles */
+.skill-node {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.skill-node.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.skill-node.unlocked {
+  border-color: var(--theme-color);
+  background: rgba(var(--theme-color), 0.1);
+  /* Simplified approximation */
+}
+
+.skill-node:hover:not(.locked):not(.unlocked) {
+  border-color: #fff;
+  transform: translateX(4px);
+}
