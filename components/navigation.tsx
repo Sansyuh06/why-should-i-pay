@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Search, BookOpen, Code, FileQuestion, LayoutDashboard, Map, Users, Terminal } from 'lucide-react';
+import { Menu, X, Search, BookOpen, Code, FileQuestion, LayoutDashboard, Map, Users, Terminal, Library } from 'lucide-react';
 
 const navLinks = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
   { href: '/problems', label: 'Problems', icon: Code },
   { href: '/quizzes', label: 'Quizzes', icon: FileQuestion },
+  { href: '/resources', label: 'Resources', icon: Library },
   { href: '/ide', label: 'IDE', icon: Terminal },
   { href: '/roadmaps', label: 'Roadmaps', icon: Map },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/community', label: 'Community', icon: Users },
 ];
 
 export function Navigation() {
@@ -36,11 +36,10 @@ export function Navigation() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-xs uppercase tracking-widest transition duration-300 ${
-                  isActive
+                className={`text-xs uppercase tracking-widest transition duration-300 ${isActive
                     ? 'text-foreground font-medium'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -105,11 +104,10 @@ export function Navigation() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 text-sm transition ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 text-sm transition ${isActive
                       ? 'text-foreground bg-secondary/50 font-medium'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   {link.label}

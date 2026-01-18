@@ -1,159 +1,174 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { LoadingState, ErrorState, NoResultsState } from '@/components/error-states';
+import { useState, useMemo } from 'react';
 import { Navigation, Footer } from '@/components/navigation';
+import { allProblems, getCompanies, problemStats, CatalogProblem } from '@/lib/problemCatalog';
+import { allIntegratedProblems, integratedStats, tcsAptitudeQuestions } from '@/lib/integratedCatalog';
 
 export default function ProblemsPage() {
-  const [dsaTopics, setDsaTopics] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const { dsaTopics: topics } = await import('@/lib/courseContent');
-        
-        if (!topics || !Array.isArray(topics) || topics.length === 0) {
-          setError('No problems available. The content database may be empty.');
-          console.error('[v0] Topics data is empty or invalid');
-          return;
-        }
+  const companies = useMemo(() => getCompanies(), []);
 
-        const hasProblems = topics.some(topic => topic?.problems && Array.isArray(topic.problems) && topic.problems.length > 0);
-        if (!hasProblems) {
-          setError('No problems found in the database.');
-          console.error('[v0] No problems found in any topic');
-          return;
-        }
-        
-        setDsaTopics(topics || []);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load problems';
-        console.error('[v0] Error loading problems:', error);
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
+  const topics = useMemo(() => {
+    const topicSet = new Set<string>();
+    allProblems.forEach(p => topicSet.add(p.topic));
+    return Array.from(topicSet).sort();
   }, []);
 
-  // Get all problems from all topics with safety checks
-  const allProblems = (dsaTopics || []).flatMap(topic => {
-    if (!topic?.problems || !Array.isArray(topic.problems)) return [];
-    return topic.problems.map(problem => ({
-      ...problem,
-      topicId: topic.id,
-      topicTitle: topic.title
-    }));
-  });
+  const filteredProblems = useMemo(() => {
+    let filtered = [...allProblems];
 
-  let filteredProblems = allProblems;
-  if (selectedDifficulty) {
-    filteredProblems = filteredProblems.filter(p => p?.difficulty === selectedDifficulty);
-  }
-  if (selectedTopic) {
-    filteredProblems = filteredProblems.filter(p => p?.topicId === selectedTopic);
-  }
+    if(selectedDifficulty) {
+      filtered = filtered.filter(p => p.difficulty === selectedDifficulty.toLowerCase());
+    }
+    if(selectedTopic) {
+      filtered = filtered.filter(p => p.topic === selectedTopic);
+    }
+    if(selectedCompany) {
+      filtered = filtered.filter(p => p.companies.includes(selectedCompany));
+    }
+    if(searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.title.toLowerCase().includes(query) ||
+        p.tags.some(t => t.toLowerCase().includes(query))
+      );
+    }
 
-  if (isLoading) {
-    return <LoadingState message="Loading problems..." />;
-  }
+    return filtered;
+  }, [selectedDifficulty, selectedTopic, selectedCompany, searchQuery]);
 
-  if (error) {
-    return <ErrorState 
-      title="Failed to Load Problems"
-      description={error}
-      action="/problems"
-      actionLabel="Retry"
-    />;
-  }
-
-  if (!dsaTopics || dsaTopics.length === 0) {
-    return <ErrorState 
-      title="No Problems Available"
-      description="The problems database is currently unavailable."
-      action="/"
-      actionLabel="Return Home"
-    />;
-  }
+  const clearFilters = () => {
+    setSelectedDifficulty(null);
+    setSelectedTopic(null);
+    setSelectedCompany(null);
+    setSearchQuery('');
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-8 md:px-12">
-        <div className="max-w-5xl">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6 md:mb-8">
-            Practice Problems
-          </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            1000+ carefully curated problems with solutions in multiple programming languages. Learn by solving.
-          </p>
-        </div>
+      {/* Header */}
+      <section className="pt-32 pb-8 px-6 md:px-12">
+        <h1 className="text-3xl font-bold mb-2">Problems</h1>
+        <p className="text-muted-foreground text-sm">
+          {problemStats.total + integratedStats.totalProblems}+ problems. No fluff.
+        </p>
+      </section>
+
+      {/* Search */}
+      <section className="px-8 md:px-12 pb-8">
+        <input
+          type="text"
+          placeholder="Search problems by name or tag..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full max-w-xl px-4 py-3 bg-muted border border-border/30 rounded-lg focus:outline-none focus:border-primary transition-colors"
+        />
       </section>
 
       {/* Filters */}
-      <section className="px-8 md:px-12 py-16 md:py-20 border-b border-border/30 space-y-8">
+      <section className="px-8 md:px-12 py-8 border-b border-border/30 space-y-8">
+        {/* Difficulty Filter */}
         <div>
           <h3 className="text-lg md:text-xl font-black mb-4">Filter by Difficulty</h3>
           <div className="flex gap-3 md:gap-4 flex-wrap">
             <button
               onClick={() => setSelectedDifficulty(null)}
-              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${
-                selectedDifficulty === null
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border/30 hover:border-border/60'
-              }`}
-            >
-              All Levels
-            </button>
-            {['Easy', 'Medium', 'Hard'].map((level) => (
-              <button
-                key={level}
-                onClick={() => setSelectedDifficulty(level)}
-                className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${
-                  selectedDifficulty === level
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border/30 hover:border-border/60'
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedDifficulty === null
+                ? 'border-foreground bg-foreground text-background'
+                : 'border-border/30 hover:border-border/60'
                 }`}
-              >
-                {level}
-              </button>
-            ))}
+            >
+              All ({problemStats.total})
+            </button>
+            <button
+              onClick={() => setSelectedDifficulty('easy')}
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedDifficulty === 'easy'
+                ? 'border-green-500 bg-green-500/10 text-green-500'
+                : 'border-border/30 hover:border-green-500/50 text-green-500'
+                }`}
+            >
+              Easy ({problemStats.byDifficulty.easy})
+            </button>
+            <button
+              onClick={() => setSelectedDifficulty('medium')}
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedDifficulty === 'medium'
+                ? 'border-yellow-500 bg-yellow-500/10 text-yellow-500'
+                : 'border-border/30 hover:border-yellow-500/50 text-yellow-500'
+                }`}
+            >
+              Medium ({problemStats.byDifficulty.medium})
+            </button>
+            <button
+              onClick={() => setSelectedDifficulty('hard')}
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedDifficulty === 'hard'
+                ? 'border-red-500 bg-red-500/10 text-red-500'
+                : 'border-border/30 hover:border-red-500/50 text-red-500'
+                }`}
+            >
+              Hard ({problemStats.byDifficulty.hard})
+            </button>
           </div>
         </div>
 
+        {/* Topic Filter */}
         <div>
           <h3 className="text-lg md:text-xl font-black mb-4">Filter by Topic</h3>
           <div className="flex gap-3 md:gap-4 flex-wrap">
             <button
               onClick={() => setSelectedTopic(null)}
-              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${
-                selectedTopic === null
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border/30 hover:border-border/60'
-              }`}
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedTopic === null
+                ? 'border-foreground bg-foreground text-background'
+                : 'border-border/30 hover:border-border/60'
+                }`}
             >
               All Topics
             </button>
-            {(dsaTopics || []).map((topic) => (
+            {topics.map((topic) => (
               <button
-                key={topic?.id}
-                onClick={() => setSelectedTopic(topic?.id)}
-                className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${
-                  selectedTopic === topic?.id
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border/30 hover:border-border/60'
-                }`}
+                key={topic}
+                onClick={() => setSelectedTopic(topic)}
+                className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedTopic === topic
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border/30 hover:border-border/60'
+                  }`}
               >
-                {topic?.title}
+                {topic.replace(/-/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Company Filter */}
+        <div>
+          <h3 className="text-lg md:text-xl font-black mb-4">Filter by Company</h3>
+          <div className="flex gap-3 md:gap-4 flex-wrap">
+            <button
+              onClick={() => setSelectedCompany(null)}
+              className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedCompany === null
+                ? 'border-foreground bg-foreground text-background'
+                : 'border-border/30 hover:border-border/60'
+                }`}
+            >
+              All Companies
+            </button>
+            {companies.slice(0, 10).map((company) => (
+              <button
+                key={company}
+                onClick={() => setSelectedCompany(company)}
+                className={`px-4 py-2 text-xs md:text-sm uppercase tracking-widest font-medium border transition-all duration-300 ${selectedCompany === company
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border/30 hover:border-primary/50'
+                  }`}
+              >
+                {company}
               </button>
             ))}
           </div>
@@ -162,41 +177,22 @@ export default function ProblemsPage() {
 
       {/* Problems List */}
       <section className="px-8 md:px-12 py-16 md:py-20">
-        <h2 className="text-2xl md:text-3xl font-black mb-8">Problems ({filteredProblems.length})</h2>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-black">Problems ({filteredProblems.length})</h2>
+          {(selectedDifficulty || selectedTopic || selectedCompany || searchQuery) && (
+            <button
+              onClick={clearFilters}
+              className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
 
         {filteredProblems.length > 0 ? (
           <div className="space-y-4 md:space-y-6">
             {filteredProblems.map((problem) => (
-              <Link key={`${problem.topicId}-${problem.id}`} href={`/problems/${problem.topicId}/${problem.id}`}>
-                <div className="border border-border/30 p-6 md:p-8 hover:border-border/60 transition-all duration-300 group cursor-pointer">
-                  <div className="flex items-start justify-between mb-4 gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg md:text-xl font-black mb-2 group-hover:translate-x-2 transition-transform duration-300">
-                        {problem.title || 'Untitled Problem'}
-                      </h3>
-                      <p className="text-sm md:text-base text-muted-foreground">{problem.description || 'No description available'}</p>
-                    </div>
-                    <div className="flex gap-2 md:gap-3 flex-wrap flex-shrink-0 justify-end">
-                      <span className={`px-3 md:px-4 py-1 md:py-2 text-xs font-bold rounded-full whitespace-nowrap ${
-                        problem.difficulty === 'Easy'
-                          ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                          : problem.difficulty === 'Medium'
-                          ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                          : 'bg-red-500/10 text-red-600 dark:text-red-400'
-                      }`}>
-                        {problem.difficulty || 'Unrated'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground">
-                    <span className="border-l border-border/30 pl-4">Topic: {problem.topicTitle || 'Unknown'}</span>
-                    {problem.complexity && (
-                      <span className="border-l border-border/30 pl-4">Time: {problem.complexity.time || 'N/A'} | Space: {problem.complexity.space || 'N/A'}</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+              <ProblemCard key={problem.id} problem={problem} />
             ))}
           </div>
         ) : (
@@ -204,13 +200,10 @@ export default function ProblemsPage() {
             <div className="space-y-4 max-w-md mx-auto">
               <h3 className="text-xl md:text-2xl font-black">No Problems Found</h3>
               <p className="text-muted-foreground">
-                Try adjusting your filters or select different difficulty levels to see more problems.
+                Try adjusting your filters or search to find problems.
               </p>
               <button
-                onClick={() => {
-                  setSelectedDifficulty(null);
-                  setSelectedTopic(null);
-                }}
+                onClick={clearFilters}
                 className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300 mt-4"
               >
                 Clear Filters
@@ -222,23 +215,72 @@ export default function ProblemsPage() {
 
       {/* Stats */}
       <section className="px-8 md:px-12 py-16 md:py-20 border-t border-border/30">
-        <div className="grid grid-cols-3 gap-6 md:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
           <div>
-            <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">{allProblems.length}+</div>
+            <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">{problemStats.total}+</div>
             <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Total Problems</div>
           </div>
           <div>
-            <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">3+</div>
-            <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Languages</div>
+            <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">{companies.length}</div>
+            <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Companies</div>
+          </div>
+          <div>
+            <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">{topics.length}</div>
+            <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Topics</div>
           </div>
           <div>
             <div className="text-3xl md:text-5xl font-black mb-3 md:mb-4 text-accent">100%</div>
-            <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Free & Offline</div>
+            <div className="text-xs md:text-sm text-muted-foreground uppercase tracking-widest">Free</div>
           </div>
         </div>
       </section>
 
       <Footer />
     </div>
+  );
+}
+
+function ProblemCard({ problem }: { problem: CatalogProblem }) {
+  return (
+    <a
+      href={problem.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block border border-border/30 p-6 md:p-8 hover:border-border/60 transition-all duration-300 group cursor-pointer"
+    >
+      <div className="flex items-start justify-between mb-4 gap-4">
+        <div className="flex-1">
+          <h3 className="text-lg md:text-xl font-black mb-2 group-hover:translate-x-2 transition-transform duration-300">
+            {problem.title}
+            <span className="ml-2 text-xs font-normal text-muted-foreground">↗ LeetCode</span>
+          </h3>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {problem.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="px-2 py-1 text-xs bg-muted rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2 md:gap-3 flex-wrap flex-shrink-0 justify-end">
+          <span className={`px-3 md:px-4 py-1 md:py-2 text-xs font-bold rounded-full whitespace-nowrap ${problem.difficulty === 'easy'
+            ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+            : problem.difficulty === 'medium'
+              ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+            }`}>
+            {problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 text-xs md:text-sm text-muted-foreground flex-wrap">
+        <span>Pattern: {problem.pattern.replace(/-/g, ' ')}</span>
+        <span className="border-l border-border/30 pl-4">
+          Companies: {problem.companies.slice(0, 3).join(', ')}
+          {problem.companies.length > 3 && ` +${problem.companies.length - 3}`}
+        </span>
+      </div>
+    </a>
   );
 }

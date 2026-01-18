@@ -256,22 +256,13 @@ Key concepts:
 - Common operations: insert, delete, search, sort`,
         resources: [
           {
-            id: 'arr-gfg-1',
+            id: 'arr-guide',
             type: 'article',
             title: 'Arrays in Data Structures',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/array-data-structure/',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-arrays',
             difficulty: 'beginner',
             content: 'Comprehensive guide to arrays covering basics, operations, and time complexity analysis.'
-          },
-          {
-            id: 'arr-w3-1',
-            type: 'documentation',
-            title: 'JavaScript Arrays',
-            source: 'W3Schools',
-            url: 'https://www.w3schools.com/js/js_arrays.asp',
-            difficulty: 'beginner',
-            content: 'Complete reference for JavaScript array methods and operations.'
           }
         ],
         problems: [],
@@ -295,11 +286,11 @@ Key operations:
 - Spiral traversal: O(m*n)`,
         resources: [
           {
-            id: '2d-arr-1',
+            id: '2d-arr-guide',
             type: 'article',
-            title: '2D Array/Matrix',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/multidimensional-arrays-c-cpp/',
+            title: '2D Array/Matrix Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-arrays',
             difficulty: 'beginner'
           }
         ],
@@ -332,11 +323,11 @@ Disadvantages:
 - Cache unfriendly`,
         resources: [
           {
-            id: 'll-gfg-1',
+            id: 'll-guide',
             type: 'article',
-            title: 'Singly Linked List Introduction',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/linked-list-set-1-introduction/',
+            title: 'Singly Linked List Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-linked-list',
             difficulty: 'beginner'
           }
         ],
@@ -370,11 +361,11 @@ Key operations:
 - Peek: O(1)`,
         resources: [
           {
-            id: 'stack-gfg-1',
+            id: 'stack-guide',
             type: 'article',
             title: 'Stack Data Structure',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/stack-data-structure-introduction-program/',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-stack-queue',
             difficulty: 'beginner'
           }
         ],
@@ -398,11 +389,11 @@ Key operations:
 - Peek: O(1)`,
         resources: [
           {
-            id: 'queue-gfg-1',
+            id: 'queue-guide',
             type: 'article',
             title: 'Queue Data Structure',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/queue-data-structure/',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-stack-queue',
             difficulty: 'beginner'
           }
         ],
@@ -437,11 +428,11 @@ Applications:
 - Huffman coding`,
         resources: [
           {
-            id: 'tree-gfg-1',
+            id: 'tree-guide',
             type: 'article',
-            title: 'Binary Tree Introduction',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/binary-tree-data-structure/',
+            title: 'Binary Tree Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-trees',
             difficulty: 'intermediate'
           }
         ],
@@ -467,11 +458,11 @@ Balancing:
 - Red-Black Trees: Color balanced`,
         resources: [
           {
-            id: 'bst-gfg-1',
+            id: 'bst-guide',
             type: 'article',
-            title: 'Binary Search Tree',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/',
+            title: 'Binary Search Tree Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-trees',
             difficulty: 'intermediate'
           }
         ],
@@ -505,11 +496,11 @@ Representations:
 - Edge List: O(E) space`,
         resources: [
           {
-            id: 'graph-gfg-1',
+            id: 'graph-guide',
             type: 'article',
-            title: 'Graph Representation',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/',
+            title: 'Graph Representation Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-graphs',
             difficulty: 'intermediate'
           }
         ],
@@ -544,11 +535,11 @@ Major Algorithms:
 - Counting Sort: O(n+k), stable, not in-place`,
         resources: [
           {
-            id: 'sort-gfg-1',
+            id: 'sort-guide',
             type: 'article',
-            title: 'Sorting Algorithms',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/sorting-algorithms/',
+            title: 'Sorting Algorithms Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-sorting',
             difficulty: 'intermediate'
           }
         ],
@@ -584,11 +575,11 @@ Variations:
 - Search insert position`,
         resources: [
           {
-            id: 'search-gfg-1',
+            id: 'search-guide',
             type: 'article',
-            title: 'Searching Algorithms',
-            source: 'GeeksforGeeks',
-            url: 'https://www.geeksforgeeks.org/searching-algorithms/',
+            title: 'Searching Algorithms Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-searching',
             difficulty: 'beginner'
           }
         ],

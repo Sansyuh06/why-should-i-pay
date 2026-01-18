@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { LoadingState, ErrorState, EmptyState } from '@/components/error-states';
 import { Navigation, Footer } from '@/components/navigation';
+import { quizzes as dataQuizzes } from '@/lib/data';
 
-export default function QuizzesPage() {
+function QuizzesContent() {
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,50 +15,45 @@ export default function QuizzesPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const { quizzes: loadedQuizzes } = await import('@/lib/courseContent');
-        
-        if (!loadedQuizzes || !Array.isArray(loadedQuizzes) || loadedQuizzes.length === 0) {
-          setError('No quizzes available.');
-          console.error('[v0] Quizzes data is empty or invalid');
-          return;
-        }
-
-        const hasValidQuestions = loadedQuizzes.every(q => 
-          q?.questions && Array.isArray(q.questions) && q.questions.length > 0
-        );
-
-        if (!hasValidQuestions) {
-          setError('Quiz questions are incomplete or missing.');
-          console.error('[v0] Some quizzes have invalid questions');
-          return;
-        }
-
-        setQuizzes(loadedQuizzes || []);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load quizzes';
-        console.error('[v0] Error loading quizzes:', error);
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
+    // Load quizzes directly from data
+    if(dataQuizzes && dataQuizzes.length > 0) {
+      setQuizzes(dataQuizzes);
+      setIsLoading(false);
+    } else {
+      setError('No quizzes found');
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    const quizId = searchParams.get('id');
+    if(quizId && quizzes.length > 0) {
+      const exists = quizzes.find(q => q.id === quizId);
+      if(exists) {
+        setSelectedQuiz(quizId);
+      }
+    }
+  }, [searchParams, quizzes]);
+
+  // ... rest of component logic (quiz, currentQuestion, handlers) ...
+  // But wait, the original component defined these variables in the function scope.
+  // I need to be careful not to break the rest of the file.
+  // I am replacing the top part of the component.
+  // I should verify where `QuizzesPage` ends its variable declarations.
+
 
   const quiz = selectedQuiz ? quizzes.find(q => q?.id === selectedQuiz) : null;
   const currentQuestion = quiz && quiz.questions ? quiz.questions[currentQuestionIndex] : null;
 
   const handleAnswerSelect = (answerId: string) => {
-    if (!currentQuestion?.id) {
+    if(!currentQuestion?.id) {
       console.warn('[v0] Current question is missing an ID');
       return;
     }
-    
+
     setAnswers({
       ...answers,
       [currentQuestion.id]: answerId
@@ -64,7 +61,7 @@ export default function QuizzesPage() {
   };
 
   const handleNext = () => {
-    if (quiz && currentQuestionIndex < quiz.questions.length - 1) {
+    if(quiz && currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -74,10 +71,10 @@ export default function QuizzesPage() {
   };
 
   const getScore = () => {
-    if (!quiz || !quiz.questions || quiz.questions.length === 0) return 0;
+    if(!quiz || !quiz.questions || quiz.questions.length === 0) return 0;
     let correct = 0;
     quiz.questions.forEach(q => {
-      if (answers[q?.id] === q?.correctAnswer) {
+      if(answers[q?.id] === q?.correctAnswer) {
         correct++;
       }
     });
@@ -87,12 +84,12 @@ export default function QuizzesPage() {
   const score = getScore();
   const isPassed = score >= (quiz?.passingScore || 70);
 
-  if (isLoading) {
+  if(isLoading) {
     return <LoadingState message="Loading quizzes..." />;
   }
 
-  if (error) {
-    return <ErrorState 
+  if(error) {
+    return <ErrorState
       title="Failed to Load Quizzes"
       description={error}
       action="/quizzes"
@@ -100,8 +97,8 @@ export default function QuizzesPage() {
     />;
   }
 
-  if (!quizzes || quizzes.length === 0) {
-    return <EmptyState 
+  if(!quizzes || quizzes.length === 0) {
+    return <EmptyState
       title="No Quizzes Available"
       description="Assessment content is currently unavailable. Please check back later."
       action="/"
@@ -135,23 +132,22 @@ export default function QuizzesPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {quizzes.map((q) => {
                   const isValidQuiz = q?.id && q?.title && q?.questions && Array.isArray(q.questions) && q.questions.length > 0;
-                  
+
                   return (
                     <div
                       key={q?.id || Math.random()}
                       onClick={() => {
-                        if (isValidQuiz) {
+                        if(isValidQuiz) {
                           setSelectedQuiz(q.id);
                           setCurrentQuestionIndex(0);
                           setAnswers({});
                           setShowResults(false);
                         }
                       }}
-                      className={`border p-6 md:p-8 transition-all duration-300 group ${
-                        isValidQuiz
-                          ? 'border-border/30 hover:border-border/60 cursor-pointer'
-                          : 'border-red-500/30 bg-red-500/5 cursor-not-allowed'
-                      }`}
+                      className={`border p-6 md:p-8 transition-all duration-300 group ${isValidQuiz
+                        ? 'border-border/30 hover:border-border/60 cursor-pointer'
+                        : 'border-red-500/30 bg-red-500/5 cursor-not-allowed'
+                        }`}
                     >
                       <h3 className="text-lg md:text-xl font-black mb-3 group-hover:translate-x-2 transition-transform duration-300">
                         {q?.title || 'Untitled Quiz'}
@@ -200,7 +196,7 @@ export default function QuizzesPage() {
         </>
       ) : !quiz || !quiz.questions || quiz.questions.length === 0 ? (
         // Quiz missing or invalid
-        <ErrorState 
+        <ErrorState
           title="Quiz Not Found"
           description="The selected quiz is no longer available or has been corrupted. Please try selecting another quiz."
           action="/quizzes"
@@ -208,7 +204,7 @@ export default function QuizzesPage() {
         />
       ) : !currentQuestion ? (
         // Current question missing
-        <ErrorState 
+        <ErrorState
           title="Question Unavailable"
           description="The current question is missing or corrupted. Please restart the quiz."
           action="/quizzes"
@@ -273,11 +269,10 @@ export default function QuizzesPage() {
                       <h3 className="text-lg md:text-xl font-black flex-1">
                         Q{idx + 1}: {question.question}
                       </h3>
-                      <span className={`px-4 py-2 text-xs font-black rounded-full whitespace-nowrap flex-shrink-0 ${
-                        isCorrect
-                          ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                          : 'bg-red-500/10 text-red-600 dark:text-red-400'
-                      }`}>
+                      <span className={`px-4 py-2 text-xs font-black rounded-full whitespace-nowrap flex-shrink-0 ${isCorrect
+                        ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                        : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                        }`}>
                         {isCorrect ? 'Correct' : 'Incorrect'}
                       </span>
                     </div>
@@ -290,13 +285,12 @@ export default function QuizzesPage() {
                         return (
                           <div
                             key={option.id}
-                            className={`p-4 rounded-lg border transition-all duration-300 ${
-                              isCorrectOption
-                                ? 'border-green-500/50 bg-green-500/10'
-                                : isSelected && !isCorrect
+                            className={`p-4 rounded-lg border transition-all duration-300 ${isCorrectOption
+                              ? 'border-green-500/50 bg-green-500/10'
+                              : isSelected && !isCorrect
                                 ? 'border-red-500/50 bg-red-500/10'
                                 : 'border-border/30'
-                            }`}
+                              }`}
                           >
                             <p className="text-sm md:text-base">{option.text}</p>
                             {isCorrectOption && <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Correct Answer</p>}
@@ -352,11 +346,10 @@ export default function QuizzesPage() {
                   return (
                     <label
                       key={option.id}
-                      className={`flex items-start p-6 md:p-8 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                        isSelected
-                          ? 'border-foreground bg-foreground/5'
-                          : 'border-border/30 hover:border-border/60'
-                      }`}
+                      className={`flex items-start p-6 md:p-8 border-2 rounded-lg cursor-pointer transition-all duration-300 ${isSelected
+                        ? 'border-foreground bg-foreground/5'
+                        : 'border-border/30 hover:border-border/60'
+                        }`}
                     >
                       <input
                         type="radio"
@@ -407,5 +400,13 @@ export default function QuizzesPage() {
 
       {!selectedQuiz && <Footer />}
     </div>
+  );
+}
+
+export default function QuizzesPage() {
+  return (
+    <Suspense fallback={<LoadingState message="Loading quizzes..." />}>
+      <QuizzesContent />
+    </Suspense>
   );
 }
