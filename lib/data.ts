@@ -597,7 +597,34 @@ Variations:
     estimatedTime: 280,
     subtopics: [
       {
-        id: 'hash-tables',
+        id: 'dp-101',
+        domain: 'dsa',
+        name: 'Dynamic Programming',
+        description: 'Master optimization techniques for complex problems.',
+        difficulty: 'advanced',
+        estimatedTime: 600,
+        subtopics: [
+          {
+            id: 'dp-intro',
+            name: 'Introduction to Dynamic Programming',
+            content: 'Dynamic Programming is a method for solving complex problems by breaking them down into simpler subproblems. It typically applies to optimization problems.',
+            resources: [
+              {
+                id: 'dp-guide',
+                type: 'article',
+                title: 'Complete DP Guide',
+                source: 'Embedded Guide',
+                url: '/resources/notes/dsa-dp',
+                difficulty: 'advanced'
+              }
+            ],
+            problems: [],
+            completed: false
+          }
+        ]
+      },
+      {
+        id: 'hashing-101',
         name: 'Hash Tables & Hash Maps',
         content: `Hash tables use hash functions to map keys to values.
 
@@ -726,7 +753,7 @@ export const domains: Domain[] = [
     name: 'Data Structures & Algorithms',
     icon: '📊',
     description: 'Master arrays, linked lists, trees, graphs, and essential algorithms',
-    topics: ['arrays-101', 'linkedlist-101', 'stack-queue', 'trees-101', 'graphs-101', 'sorting-101', 'searching-101', 'hashing-101'],
+    topics: ['arrays-101', 'linkedlist-101', 'stack-queue', 'trees-101', 'graphs-101', 'sorting-101', 'searching-101', 'hashing-101', 'dp-101'],
     difficulty: 'beginner'
   },
   {
