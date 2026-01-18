@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { learningPaths, dsaTopics } from '@/lib/courseContent';
 import { useState } from 'react';
 import { CheckCircle2, Circle, ChevronRight } from 'lucide-react';
+import { Navigation, Footer } from '@/components/navigation';
 
 export default function RoadmapsPage() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -14,17 +15,7 @@ export default function RoadmapsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-sm bg-background/90 border-b border-border/40">
-        <div className="max-w-full mx-auto px-8 md:px-12 py-6 md:py-8 flex items-center justify-between">
-          <Link href="/" className="text-xs font-black tracking-widest uppercase hover:opacity-60 transition">Why Should I Pay</Link>
-          <div className="flex items-center gap-8 md:gap-16 hidden md:flex">
-            <Link href="/learn" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Learn</Link>
-            <Link href="/problems" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Problems</Link>
-            <Link href="/quizzes" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Quizzes</Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {!selectedPath && (
         <div>
@@ -161,8 +152,10 @@ export default function RoadmapsPage() {
             <p className="text-muted-foreground mb-4">
               Build your own personalized learning path based on your goals
             </p>
-            <Button>Create Custom Path →</Button>
+            <Button>Create Custom Path</Button>
           </Card>
+
+          <Footer />
         </div>
       )}
     </div>

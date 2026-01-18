@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/card';
 import { Heart, MessageCircle, Share2, Plus, Search, Filter } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { Navigation, Footer } from '@/components/navigation';
+import Loading from './loading';
 
 const communityPosts = [
   {
@@ -74,8 +76,6 @@ const studyGroups = [
   }
 ];
 
-const Loading = () => null;
-
 export default function CommunityPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,7 +90,8 @@ export default function CommunityPage() {
 
   return (
     <Suspense fallback={<Loading />}>
-      <div className="min-h-screen bg-background pt-20">
+      <div className="min-h-screen bg-background">
+        <Navigation />
         {/* Header */}
         <div className="border-b border-border py-8 px-4 sm:px-6 lg:px-8 bg-card/50">
           <div className="max-w-7xl mx-auto">

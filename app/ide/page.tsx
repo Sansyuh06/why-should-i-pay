@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { Navigation } from '@/components/navigation';
 
 const LANGUAGES = [
   { id: 'python', label: 'Python', extension: '.py', defaultCode: 'print("Hello, World!")' },
@@ -82,17 +83,7 @@ export default function IDEPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-sm bg-background/90 border-b border-border/40">
-        <div className="max-w-full mx-auto px-8 md:px-12 py-6 md:py-8 flex items-center justify-between">
-          <Link href="/" className="text-xs font-black tracking-widest uppercase hover:opacity-60 transition">Why Should I Pay</Link>
-          <div className="flex items-center gap-8 md:gap-16 hidden md:flex">
-            <Link href="/learn" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Learn</Link>
-            <Link href="/problems" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Problems</Link>
-            <Link href="/quizzes" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Quizzes</Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <div className="flex-1 mt-24 md:mt-20 flex flex-col md:flex-row">

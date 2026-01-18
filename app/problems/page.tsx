@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { LoadingState, ErrorState, NoResultsState } from '@/components/error-states';
+import { Navigation, Footer } from '@/components/navigation';
 
 export default function ProblemsPage() {
   const [dsaTopics, setDsaTopics] = useState<any[]>([]);
@@ -84,17 +85,7 @@ export default function ProblemsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-sm bg-background/90 border-b border-border/40">
-        <div className="max-w-full mx-auto px-8 md:px-12 py-6 md:py-8 flex items-center justify-between">
-          <Link href="/" className="text-xs font-black tracking-widest uppercase hover:opacity-60 transition">Why Should I Pay</Link>
-          <div className="flex items-center gap-8 md:gap-16 hidden md:flex">
-            <Link href="/learn" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Learn</Link>
-            <Link href="/problems" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Problems</Link>
-            <Link href="/quizzes" className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition duration-300">Quizzes</Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="pt-32 md:pt-40 pb-16 md:pb-24 px-8 md:px-12">
@@ -247,17 +238,7 @@ export default function ProblemsPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/30 py-12 md:py-16 px-8 md:px-12 mt-16 md:mt-24">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 text-xs md:text-sm text-muted-foreground">
-          <p>© 2025 Why Should I Pay. Free. Forever.</p>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-foreground transition">Privacy</a>
-            <a href="#" className="hover:text-foreground transition">Terms</a>
-            <a href="#" className="hover:text-foreground transition">Contact</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

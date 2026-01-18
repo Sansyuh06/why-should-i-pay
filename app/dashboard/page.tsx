@@ -11,8 +11,9 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { LoadingState } from '@/components/error-states';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
-import Target from '@/components/icons/Target'; // Import Target icon
-import Trophy from '@/components/icons/Trophy'; // Import Trophy icon
+import Target from '@/components/icons/Target';
+import Trophy from '@/components/icons/Trophy';
+import { Navigation, Footer } from '@/components/navigation';
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +66,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20">
+    <div className="min-h-screen bg-background">
+      <Navigation />
       {/* Header */}
       <div className="border-b border-border py-8 px-4 sm:px-6 lg:px-8 bg-card/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
