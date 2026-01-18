@@ -6,6 +6,7 @@ import { LoadingState, ErrorState, EmptyState } from '@/components/error-states'
 import { Navigation, Footer } from '@/components/navigation';
 import { gfgTutorials, gfgQuizzes, interactivePlatforms } from '@/lib/learningResources';
 import { dsaTopics, sampleProblems, quizzes } from '@/lib/data';
+import { allIntegratedProblems } from '@/lib/integratedCatalog';
 
 // Helper to count problems
 const getProblemCount = (topicId: string) => {
@@ -278,14 +279,7 @@ export default function LearnPage() {
           ))}
         </div>
       </section>
-    </a>
-  ))
-}
-        </div >
-      </section >
-
-  {/* Interactive Platforms */ }
-  < section className = "px-8 md:px-12 py-16 md:py-20 border-t border-border/20" >
+      <section className="px-8 md:px-12 py-16 md:py-20 border-t border-border/20">
         <h2 className="text-2xl md:text-3xl font-black mb-2">Interactive Platforms</h2>
         <p className="text-sm text-muted-foreground mb-8">Learn with visualizations</p>
 
@@ -310,7 +304,7 @@ export default function LearnPage() {
         </div>
       </section >
 
-  <Footer />
+      <Footer />
     </div >
   );
 }
