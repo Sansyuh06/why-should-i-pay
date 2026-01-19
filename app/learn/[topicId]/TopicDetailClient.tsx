@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { dsaTopics, sampleProblems } from '@/lib/data';
+import { dsaTopics } from '@/lib/data';
+import { allIntegratedProblems, IntegratedProblem } from '@/lib/integratedCatalog';
 import { TopicNotFoundState } from '@/components/error-states';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,13 +14,24 @@ export function TopicDetailClient({ topicId }: { topicId: string }) {
     const topic = dsaTopics.find(t => t.id === topicId);
     const [activeSubtopic, setActiveSubtopic] = useState(0);
 
+    // Get relevant problems
+    const relevantProblems = topic
+        ? allIntegratedProblems.filter(p => {
+            const topicName = topic.name.toLowerCase();
+            const topicTags = topicName.split(' '); // e.g., ["Linked", "List"]
+
+            // Check if any tag matches topic name parts OR matches exact category
+            return p.tags.some(t => topicTags.includes(t.toLowerCase())) ||
+                p.category.toLowerCase().includes(topicName) ||
+                p.tags.some(t => t.toLowerCase() === topicName);
+        }).slice(0, 5) // Show top 5
+        : [];
+
     useEffect(() => {
-        // Load all topics for suggestions
         setAllTopics(dsaTopics);
     }, []);
 
     if(!topic) {
-        // Get other topics as suggestions, excluding similar IDs
         const suggestedTopics = dsaTopics
             .filter(t => t.id !== topicId)
             .slice(0, 4);
@@ -31,18 +43,13 @@ export function TopicDetailClient({ topicId }: { topicId: string }) {
 
     const getResourceIcon = (type: string) => {
         switch(type) {
-            case 'video':
-                return <Video className="w-4 h-4" />;
-            case 'article':
-                return <FileText className="w-4 h-4" />;
-            case 'visualization':
-                return <Code2 className="w-4 h-4" />;
-            default:
-                return <BookOpen className="w-4 h-4" />;
+            case 'video': return <Video className="w-4 h-4" />;
+            case 'article': return <FileText className="w-4 h-4" />;
+            case 'visualization': return <Code2 className="w-4 h-4" />;
+            default: return <BookOpen className="w-4 h-4" />;
         }
     };
 
-    // Safe access to subtopic with fallback
     if(!subtopic) {
         return (
             <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-8">
@@ -50,22 +57,8 @@ export function TopicDetailClient({ topicId }: { topicId: string }) {
                     <div>
                         <h1 className="text-3xl md:text-4xl font-black mb-3">Section Not Available</h1>
                         <p className="text-muted-foreground leading-relaxed">
-                            This section is currently unavailable. Please try another section or explore other topics.
+                            This section is currently unavailable.
                         </p>
-                    </div>
-                    <div className="flex gap-4 justify-center flex-wrap">
-                        <Link
-                            href="/learn"
-                            className="text-xs md:text-sm uppercase tracking-widest font-medium border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition duration-300"
-                        >
-                            Browse Topics
-                        </Link>
-                        <Link
-                            href="/"
-                            className="text-xs md:text-sm uppercase tracking-widest font-medium text-muted-foreground hover:text-foreground transition duration-300"
-                        >
-                            Home
-                        </Link>
                     </div>
                 </div>
             </div>
@@ -124,135 +117,132 @@ export function TopicDetailClient({ topicId }: { topicId: string }) {
 
                     {/* Main Content */}
                     <div className="lg:col-span-2">
-                        {subtopic && (
-                            <div className="space-y-8">
-                                {/* Content */}
-                                <Card className="p-8">
-                                    <h2 className="text-3xl font-bold mb-6">{subtopic.name}</h2>
-                                    <div className="prose prose-invert max-w-none">
-                                        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                                            {subtopic.content}
-                                        </p>
-                                    </div>
-                                </Card>
+                        <div className="space-y-8">
+                            {/* Content */}
+                            <Card className="p-8">
+                                <h2 className="text-3xl font-bold mb-6">{subtopic.name}</h2>
+                                <div className="prose prose-invert max-w-none">
+                                    <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                                        {subtopic.content}
+                                    </p>
+                                </div>
+                            </Card>
 
-                                {/* Resources */}
-                                <div>
-                                    <h3 className="text-2xl font-bold mb-6">📚 Resources</h3>
-                                    <div className="space-y-4">
-                                        {subtopic.resources.map(resource => (
-                                            <Card key={resource.id} className="p-4 hover:shadow-lg transition">
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-3 mb-2">
-                                                            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-                                                                {getResourceIcon(resource.type)}
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="font-bold">{resource.title}</h4>
-                                                                <p className="text-sm text-muted-foreground">{resource.source}</p>
-                                                            </div>
+                            {/* Resources */}
+                            <div>
+                                <h3 className="text-2xl font-bold mb-6">📚 Resources</h3>
+                                <div className="space-y-4">
+                                    {subtopic.resources.map(resource => (
+                                        <Card key={resource.id} className="p-4 hover:shadow-lg transition">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                                                            {getResourceIcon(resource.type)}
                                                         </div>
-                                                        {resource.content && (
-                                                            <p className="text-sm text-muted-foreground mt-2">{resource.content}</p>
-                                                        )}
+                                                        <div>
+                                                            <h4 className="font-bold">{resource.title}</h4>
+                                                            <p className="text-sm text-muted-foreground">{resource.source}</p>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 ml-4">
-                                                        {resource.duration && (
-                                                            <span className="text-xs bg-muted px-2 py-1 rounded">
-                                                                {resource.duration}m
-                                                            </span>
-                                                        )}
-                                                        <Button variant="ghost" size="sm" asChild>
+                                                    {resource.content && (
+                                                        <p className="text-sm text-muted-foreground mt-2">{resource.content}</p>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2 ml-4">
+                                                    {resource.duration && (
+                                                        <span className="text-xs bg-muted px-2 py-1 rounded">
+                                                            {resource.duration}m
+                                                        </span>
+                                                    )}
+                                                    <Button variant="ghost" size="sm" asChild>
+                                                        {resource.url.startsWith('http') ? (
                                                             <a href={resource.url} target="_blank" rel="noopener noreferrer">
                                                                 Open →
                                                             </a>
-                                                        </Button>
-                                                    </div>
+                                                        ) : (
+                                                            <Link href={resource.url}>
+                                                                Open →
+                                                            </Link>
+                                                        )}
+                                                    </Button>
                                                 </div>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Practice Problems */}
-                                {sampleProblems.length > 0 && (
-                                    <div>
-                                        <h3 className="text-2xl font-bold mb-6">💪 Practice Problems</h3>
-                                        <div className="space-y-4">
-                                            {sampleProblems.slice(0, 2).map(problem => (
-                                                <Link key={problem.id} href={`/problems/${problem.id}`}>
-                                                    <Card className="p-4 hover:shadow-lg hover:border-primary transition cursor-pointer">
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex-1">
-                                                                <h4 className="font-bold text-lg hover:text-primary transition">
-                                                                    {problem.title}
-                                                                </h4>
-                                                                <p className="text-sm text-muted-foreground mt-1">
-                                                                    {problem.description.substring(0, 100)}...
-                                                                </p>
-                                                                <div className="flex items-center gap-2 mt-3 flex-wrap">
-                                                                    <span
-                                                                        className={`px-2 py-1 text-xs font-bold rounded ${problem.difficulty === 'easy'
-                                                                            ? 'bg-green-500/10 text-green-500'
-                                                                            : problem.difficulty === 'medium'
-                                                                                ? 'bg-yellow-500/10 text-yellow-500'
-                                                                                : 'bg-red-500/10 text-red-500'
-                                                                            }`}
-                                                                    >
-                                                                        {problem.difficulty}
-                                                                    </span>
-                                                                    {problem.category.map(cat => (
-                                                                        <span
-                                                                            key={cat}
-                                                                            className="px-2 py-1 text-xs bg-muted rounded text-muted-foreground"
-                                                                        >
-                                                                            {cat}
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right ml-4">
-                                                                <div className="text-sm font-bold text-primary">
-                                                                    {problem.acceptance}%
-                                                                </div>
-                                                                <div className="text-xs text-muted-foreground">acceptance</div>
-                                                                <ChevronRight className="w-5 h-5 mt-2 text-primary" />
-                                                            </div>
-                                                        </div>
-                                                    </Card>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                        <Link href="/problems" className="mt-4 inline-block">
-                                            <Button variant="outline">View All Problems →</Button>
-                                        </Link>
-                                    </div>
-                                )}
-
-                                {/* Complete Button */}
-                                <div className="flex gap-4">
-                                    {activeSubtopic > 0 && (
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => setActiveSubtopic(activeSubtopic - 1)}
-                                        >
-                                            ← Previous
-                                        </Button>
-                                    )}
-                                    {activeSubtopic < topic.subtopics.length - 1 && (
-                                        <Button onClick={() => setActiveSubtopic(activeSubtopic + 1)}>
-                                            Next →
-                                        </Button>
-                                    )}
-                                    {activeSubtopic === topic.subtopics.length - 1 && (
-                                        <Button className="flex-1">
-                                            ✓ Mark Section Complete
-                                        </Button>
-                                    )}
+                                            </div>
+                                        </Card>
+                                    ))}
                                 </div>
                             </div>
-                        )}
+
+                            {/* Practice Problems */}
+                            {relevantProblems.length > 0 && (
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-6">💪 Practice Problems</h3>
+                                    <div className="space-y-4">
+                                        {relevantProblems.map(problem => (
+                                            <Link key={problem.id} href={`/problems/${problem.id}`}>
+                                                <Card className="p-4 hover:shadow-lg hover:border-primary transition cursor-pointer">
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex-1">
+                                                            <h4 className="font-bold text-lg hover:text-primary transition">
+                                                                {problem.title}
+                                                            </h4>
+                                                            <div className="flex items-center gap-2 mt-3 flex-wrap">
+                                                                <span
+                                                                    className={`px-2 py-1 text-xs font-bold rounded ${problem.difficulty === 'easy'
+                                                                        ? 'bg-green-500/10 text-green-500'
+                                                                        : problem.difficulty === 'medium'
+                                                                            ? 'bg-yellow-500/10 text-yellow-500'
+                                                                            : 'bg-red-500/10 text-red-500'
+                                                                        }`}
+                                                                >
+                                                                    {problem.difficulty.toUpperCase()}
+                                                                </span>
+                                                                {problem.tags.slice(0, 3).map(tag => (
+                                                                    <span
+                                                                        key={tag}
+                                                                        className="px-2 py-1 text-xs bg-muted rounded text-muted-foreground"
+                                                                    >
+                                                                        {tag}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right ml-4">
+                                                            <ChevronRight className="w-5 h-5 mt-2 text-primary" />
+                                                        </div>
+                                                    </div>
+                                                </Card>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <Link href="/problems" className="mt-4 inline-block">
+                                        <Button variant="outline">View All Problems →</Button>
+                                    </Link>
+                                </div>
+                            )}
+
+                            {/* Complete Button */}
+                            <div className="flex gap-4">
+                                {activeSubtopic > 0 && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setActiveSubtopic(activeSubtopic - 1)}
+                                    >
+                                        ← Previous
+                                    </Button>
+                                )}
+                                {activeSubtopic < topic.subtopics.length - 1 && (
+                                    <Button onClick={() => setActiveSubtopic(activeSubtopic + 1)}>
+                                        Next →
+                                    </Button>
+                                )}
+                                {activeSubtopic === topic.subtopics.length - 1 && (
+                                    <Button className="flex-1">
+                                        ✓ Mark Section Complete
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

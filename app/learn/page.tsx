@@ -7,6 +7,7 @@ import { Navigation, Footer } from '@/components/navigation';
 import { gfgTutorials, gfgQuizzes, interactivePlatforms } from '@/lib/learningResources';
 import { dsaTopics, sampleProblems, quizzes } from '@/lib/data';
 import { allIntegratedProblems } from '@/lib/integratedCatalog';
+import { ExternalLink } from 'lucide-react';
 
 // Helper to count problems
 const getProblemCount = (topicId: string) => {
@@ -270,8 +271,10 @@ export default function LearnPage() {
         </div>
       </section>
       <section className="px-8 md:px-12 py-16 md:py-20 border-t border-border/20">
-        <h2 className="text-2xl md:text-3xl font-black mb-2">Interactive Platforms</h2>
-        <p className="text-sm text-muted-foreground mb-8">Learn with visualizations</p>
+        <h2 className="text-2xl md:text-3xl font-black mb-2">External Practice Platforms</h2>
+        <p className="text-sm text-muted-foreground mb-8">
+          Additional platforms for more specific practice (Links open in new tab)
+        </p>
 
         <div className="grid md:grid-cols-3 gap-6">
           {interactivePlatforms.map((platform) => (
@@ -280,21 +283,24 @@ export default function LearnPage() {
               href={platform.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-6 border border-border/20 hover:border-accent transition-colors"
+              className="group p-6 border border-border/20 hover:border-accent transition-all duration-300 relative overflow-hidden"
             >
-              <h3 className="font-bold text-accent mb-2">{platform.title}</h3>
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ExternalLink className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <h3 className="font-bold text-accent mb-2 group-hover:text-primary transition-colors">{platform.title}</h3>
               <p className="text-sm text-muted-foreground mb-4">{platform.description}</p>
               <div className="flex flex-wrap gap-2">
                 {platform.features.map((f, i) => (
-                  <span key={i} className="text-xs px-2 py-1 bg-muted/30 rounded">{f}</span>
+                  <span key={i} className="text-xs px-2 py-1 bg-muted/30 rounded text-muted-foreground">{f}</span>
                 ))}
               </div>
             </a>
           ))}
         </div>
-      </section >
+      </section>
 
       <Footer />
-    </div >
+    </div>
   );
 }

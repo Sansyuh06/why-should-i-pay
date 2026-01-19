@@ -1,8 +1,8 @@
 import { ProblemDetailClient } from './ProblemDetailClient';
-import { sampleProblems } from '@/lib/data';
+import { allProblems } from '@/lib/problemCatalog';
 
 export function generateStaticParams() {
-  return sampleProblems.map((p) => ({
+  return allProblems.map((p) => ({
     problemId: p.id,
   }));
 }

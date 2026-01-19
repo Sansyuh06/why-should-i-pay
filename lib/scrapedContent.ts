@@ -1,5 +1,5 @@
 // AUTO-GENERATED: Scraped content from external sources
-// Generated on: 2026-01-18T22:12:46.433Z
+// Generated on: 2026-01-19T15:40:07.724Z
 
 export const scrapedProblems = {
   "LeetCode Top Interview 150": [
@@ -162,10 +162,10 @@ export const scrapedProblems = {
     "Advanced SQL 50",
     "50 Advanced SQL Problems",
     "Vbarkade700",
-    "Pabitha_S",
-    "DhanvandhiniL",
-    "vnirmal9",
-    "Owais",
+    "archie680",
+    "jayaraj_g",
+    "AdityaBose544",
+    "Janani_124",
   ],
   "Naukri TCS Aptitude": [
     "Get Career-Ready with Naukri Campus",
@@ -174,16 +174,16 @@ export const scrapedProblems = {
     "TCS Aptitude Questions: TCS NQT Previous Year Questions",
     "TCS NQT Aptitude Test with Descriptive Answers",
     "Firstnaukri Aptitude Tests: Your Ultimate Preparation Partner",
+    "100+ Quantitative Aptitude Questions for Placement with Answers",
     "How to Become a Counselling Psychologist in India After 12th",
     "Highest Paying Sales Jobs in India – Salaries, Skills, Roles",
     "ACCA vs CFA: Which is Better?",
     "Game Developer: The Ultimate 2025 Guide for Students & Freshers",
-    "BCom Honours Salary in India: Freshers to Experienced",
+    "100+ Quantitative Aptitude Questions for Placement with Answers",
     "How to Write Mail for Job Application – Explained",
     "250+ Group Discussion Topics for Interviews with Expert GD Tips",
     "Latest Mechanical Engineering Interview Questions and Answers",
-    "Lessons from My Full Stack Development Internship Journey",
-    "Latest Basic Electronics Interview Questions and Answers",
+    "Basic Electronics Interview Questions with Answers for Freshers (ECE)",
     "Was this post helpful?",
   ],
 };

@@ -73,7 +73,7 @@ function QuizzesContent() {
   const getScore = () => {
     if(!quiz || !quiz.questions || quiz.questions.length === 0) return 0;
     let correct = 0;
-    quiz.questions.forEach(q => {
+    quiz.questions.forEach((q: any) => {
       if(answers[q?.id] === q?.correctAnswer) {
         correct++;
       }
@@ -130,7 +130,7 @@ function QuizzesContent() {
 
             {quizzes && quizzes.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {quizzes.map((q) => {
+                {quizzes.map((q: any) => {
                   const isValidQuiz = q?.id && q?.title && q?.questions && Array.isArray(q.questions) && q.questions.length > 0;
 
                   return (
@@ -259,7 +259,7 @@ function QuizzesContent() {
             <h2 className="text-3xl md:text-4xl font-black mb-12">Review Answers</h2>
 
             <div className="space-y-8 md:space-y-12">
-              {quiz?.questions.map((question, idx) => {
+              {quiz?.questions.map((question: any, idx: number) => {
                 const selectedAnswer = answers[question.id];
                 const isCorrect = selectedAnswer === question.correctAnswer;
 
@@ -278,7 +278,7 @@ function QuizzesContent() {
                     </div>
 
                     <div className="space-y-2 mb-6">
-                      {question.options.map((option) => {
+                      {question.options.map((option: any) => {
                         const isSelected = selectedAnswer === option.id;
                         const isCorrectOption = option.id === question.correctAnswer;
 
@@ -340,7 +340,7 @@ function QuizzesContent() {
               </h3>
 
               <div className="space-y-4 md:space-y-6">
-                {currentQuestion?.options.map((option) => {
+                {currentQuestion?.options.map((option: any) => {
                   const isSelected = answers[currentQuestion.id] === option.id;
 
                   return (

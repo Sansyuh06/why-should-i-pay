@@ -1,0 +1,26 @@
+{
+    "name": "why-should-i-pay-crawler",
+    "version": "2.0.0",
+    "description": "Automated web data collection system for the Why Should I Pay learning platform",
+    "main": "scripts/crawl.ts",
+    "scripts": {
+        "crawl": "npx ts-node scripts/crawl.ts",
+        "crawl:leetcode": "npx ts-node scripts/crawl.ts --source leetcode",
+        "crawl:codechef": "npx ts-node scripts/crawl.ts --source codechef",
+        "crawl:indiabix": "npx ts-node scripts/crawl.ts --source indiabix",
+        "crawl:dry-run": "npx ts-node scripts/crawl.ts --dry-run --verbose",
+        "validate": "npx ts-node scripts/validate.ts",
+        "scheduler:start": "npx ts-node scripts/scheduler.ts"
+    },
+    "dependencies": {
+        "cheerio": "^1.0.0-rc.12"
+    },
+    "optionalDependencies": {
+        "playwright": "^1.40.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "ts-node": "^10.9.0",
+        "typescript": "^5.0.0"
+    }
+}

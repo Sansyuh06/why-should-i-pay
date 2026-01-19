@@ -242,17 +242,14 @@ export default function ProblemsPage() {
 
 function ProblemCard({ problem }: { problem: CatalogProblem }) {
   return (
-    <a
-      href={problem.url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/problems/${problem.id}`}
       className="block border border-border/30 p-6 md:p-8 hover:border-border/60 transition-all duration-300 group cursor-pointer"
     >
       <div className="flex items-start justify-between mb-4 gap-4">
         <div className="flex-1">
-          <h3 className="text-lg md:text-xl font-black mb-2 group-hover:translate-x-2 transition-transform duration-300">
+          <h3 className="text-lg md:text-xl font-black mb-2 group-hover:translate-x-2 group-hover:text-primary transition-all duration-300">
             {problem.title}
-            <span className="ml-2 text-xs font-normal text-muted-foreground">↗ LeetCode</span>
           </h3>
           <div className="flex flex-wrap gap-2 mt-3">
             {problem.tags.slice(0, 3).map((tag) => (
@@ -281,6 +278,6 @@ function ProblemCard({ problem }: { problem: CatalogProblem }) {
           {problem.companies.length > 3 && ` +${problem.companies.length - 3}`}
         </span>
       </div>
-    </a>
+    </Link>
   );
 }

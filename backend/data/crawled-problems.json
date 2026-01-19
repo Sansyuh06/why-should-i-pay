@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "crawledAt": "2026-01-19T15:38:52.799Z",
+  "sources": [
+    "LeetCode",
+    "IndiaBix"
+  ],
+  "totalProblems": 12,
+  "problems": [
+    {
+      "title": "Logical Reasoning",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Take an Online Logical Reasoning Test Now!",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Data\r\n                                            Interpretation",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Verbal Ability",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Verbal Test",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Python Programming",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "C Programming",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Technical Interview",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Placement Papers",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Submit\r\n                                            Paper",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Contact Us",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    },
+    {
+      "title": "Privacy Policy",
+      "source": "IndiaBix",
+      "sourceUrl": "",
+      "difficulty": "medium",
+      "categories": []
+    }
+  ]
+}

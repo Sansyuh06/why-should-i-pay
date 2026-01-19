@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { sampleProblems } from '@/lib/data';
+import { allProblems } from '@/lib/problemCatalog';
+import { problemContent } from '@/lib/problemContent';
 import { ProblemNotFoundState } from '@/components/error-states';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, Copy, Check } from 'lucide-react';
+import { Play, Copy, Check, ExternalLink } from 'lucide-react';
 
 const codeTemplates: Record<string, string> = {
     javascript: `function solve(input) {
@@ -39,7 +41,21 @@ int main() {
 };
 
 export function EditorClient({ problemId }: { problemId: string }) {
-    const problem = sampleProblems.find(p => p.id === problemId);
+    // Data Resolution Logic
+    const sampleProblem = sampleProblems.find(p => p.id === problemId);
+    const manualContent = problemContent[problemId];
+    const catalogProblem = allProblems.find(p => p.id === problemId);
+
+    let problem: any = sampleProblem;
+    let hasContent = true;
+
+    if(!problem && manualContent && catalogProblem) {
+        problem = { ...catalogProblem, ...manualContent, acceptance: 85 };
+    } else if(!problem && catalogProblem) {
+        problem = { ...catalogProblem, description: null, examples: [], constraints: [], acceptance: 0 };
+        hasContent = false;
+    }
+
     const [language, setLanguage] = useState<string>('javascript');
     const [code, setCode] = useState(codeTemplates.javascript);
     const [output, setOutput] = useState<string>('');
@@ -48,11 +64,7 @@ export function EditorClient({ problemId }: { problemId: string }) {
     const [copied, setCopied] = useState(false);
 
     if(!problem) {
-        // Get other problems as suggestions
-        const suggestedProblems = sampleProblems
-            .filter(p => p.id !== problemId)
-            .slice(0, 3);
-
+        const suggestedProblems = allProblems.filter(p => p.id !== problemId).slice(0, 3);
         return <ProblemNotFoundState problemId={problemId} suggestedProblems={suggestedProblems} />;
     }
 
@@ -113,39 +125,77 @@ export function EditorClient({ problemId }: { problemId: string }) {
                                     }`}>
                                     {problem.difficulty}
                                 </span>
-                                <span className="text-sm text-muted-foreground">{problem.acceptance}% acceptance</span>
+                                {problem.acceptance > 0 && (
+                                    <span className="text-sm text-muted-foreground">{problem.acceptance}% acceptance</span>
+                                )}
                             </div>
 
-                            <h3 className="text-xl font-bold mb-4">Description</h3>
-                            <p className="text-muted-foreground mb-6 leading-relaxed">
-                                {problem.description}
-                            </p>
+                            {hasContent ? (
+                                <>
+                                    <h3 className="text-xl font-bold mb-4">Description</h3>
+                                    <p className="text-muted-foreground mb-6 leading-relaxed whitespace-pre-wrap">
+                                        {problem.description}
+                                    </p>
 
-                            <h4 className="font-bold mb-3">Constraints:</h4>
-                            <ul className="space-y-1 mb-6 text-sm text-muted-foreground">
-                                {problem.constraints.map((constraint, i) => (
-                                    <li key={i} className="flex gap-2">
-                                        <span className="text-primary">•</span>
-                                        {constraint}
-                                    </li>
-                                ))}
-                            </ul>
+                                    <h4 className="font-bold mb-3">Constraints:</h4>
+                                    <ul className="space-y-1 mb-6 text-sm text-muted-foreground font-mono bg-muted/50 p-3 rounded">
+                                        {problem.constraints.map((constraint: string, i: number) => (
+                                            <li key={i} className="flex gap-2">
+                                                • {constraint}
+                                            </li>
+                                        ))}
+                                    </ul>
 
-                            <h4 className="font-bold mb-3">Examples:</h4>
-                            {problem.examples.map((example, i) => (
-                                <div key={i} className="p-3 bg-muted rounded mb-3 text-sm">
-                                    <p className="font-mono text-xs mb-2"><span className="font-bold">Input:</span> {example.input}</p>
-                                    <p className="font-mono text-xs mb-2"><span className="font-bold">Output:</span> {example.output}</p>
-                                    <p className="text-muted-foreground"><span className="font-bold text-foreground">Explanation:</span> {example.explanation}</p>
+                                    <h4 className="font-bold mb-3">Examples:</h4>
+                                    {problem.examples.map((example: any, i: number) => (
+                                        <div key={i} className="p-3 bg-muted rounded mb-3 text-sm">
+                                            <p className="font-mono text-xs mb-2"><span className="font-bold">Input:</span> {example.input}</p>
+                                            <p className="font-mono text-xs mb-2"><span className="font-bold">Output:</span> {example.output}</p>
+                                            {example.explanation && (
+                                                <p className="text-muted-foreground"><span className="font-bold text-foreground">Explanation:</span> {example.explanation}</p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </>
+                            ) : (
+                                <div className="py-6">
+                                    <Button size="sm" asChild className="w-full gap-2 mb-6">
+                                        <a href={problem.url} target="_blank" rel="noopener noreferrer">
+                                            Open Problem Statement <ExternalLink className="w-3 h-3" />
+                                        </a>
+                                    </Button>
+
+                                    <div className="mt-6">
+                                        <h4 className="font-bold text-sm mb-3">Checklist</h4>
+                                        <ul className="space-y-2 text-sm text-muted-foreground">
+                                            <li className="flex gap-2 items-center">
+                                                <span className="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary">1</span>
+                                                Read requirements externally
+                                            </li>
+                                            <li className="flex gap-2 items-center">
+                                                <span className="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary">2</span>
+                                                Write solution in this editor
+                                            </li>
+                                            <li className="flex gap-2 items-center">
+                                                <span className="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary">3</span>
+                                                Run tests & Submit
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            ))}
+                            )}
                         </Card>
 
                         {/* Topics */}
                         <Card className="p-6">
                             <h4 className="font-bold mb-3">Related Topics</h4>
                             <div className="flex flex-wrap gap-2">
-                                {problem.category.map(cat => (
+                                {problem.tags?.map((cat: string) => (
+                                    <span key={cat} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
+                                        {cat}
+                                    </span>
+                                ))}
+                                {problem.category?.map((cat: string) => (
                                     <span key={cat} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
                                         {cat}
                                     </span>
@@ -244,25 +294,6 @@ export function EditorClient({ problemId }: { problemId: string }) {
                             <pre className="bg-muted p-3 rounded text-sm overflow-auto text-muted-foreground font-mono whitespace-pre-wrap break-words">
                                 {output || 'Output will appear here after running your code'}
                             </pre>
-                        </Card>
-
-                        {/* Hints */}
-                        <Card className="p-4">
-                            <h4 className="font-bold mb-2">💡 Hints</h4>
-                            <ul className="space-y-2 text-sm text-muted-foreground">
-                                <li className="flex gap-2">
-                                    <span>1.</span>
-                                    <span>Think about what data structure would be most efficient</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span>2.</span>
-                                    <span>Consider edge cases like empty input or single element</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span>3.</span>
-                                    <span>Check your solution against the provided examples</span>
-                                </li>
-                            </ul>
                         </Card>
                     </div>
                 </div>
