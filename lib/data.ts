@@ -596,33 +596,7 @@ Variations:
     difficulty: 'intermediate',
     estimatedTime: 280,
     subtopics: [
-      {
-        id: 'dp-101',
-        domain: 'dsa',
-        name: 'Dynamic Programming',
-        description: 'Master optimization techniques for complex problems.',
-        difficulty: 'advanced',
-        estimatedTime: 600,
-        subtopics: [
-          {
-            id: 'dp-intro',
-            name: 'Introduction to Dynamic Programming',
-            content: 'Dynamic Programming is a method for solving complex problems by breaking them down into simpler subproblems. It typically applies to optimization problems.',
-            resources: [
-              {
-                id: 'dp-guide',
-                type: 'article',
-                title: 'Complete DP Guide',
-                source: 'Embedded Guide',
-                url: '/resources/notes/dsa-dp',
-                difficulty: 'advanced'
-              }
-            ],
-            problems: [],
-            completed: false
-          }
-        ]
-      },
+
       {
         id: 'hashing-101',
         name: 'Hash Tables & Hash Maps',
@@ -652,6 +626,33 @@ Applications:
             source: 'GeeksforGeeks',
             url: 'https://www.geeksforgeeks.org/hashing-set-1-introduction/',
             difficulty: 'intermediate'
+          }
+        ],
+        problems: [],
+        completed: false
+      }
+    ]
+  },
+  {
+    id: 'dp-101',
+    domain: 'dsa',
+    name: 'Dynamic Programming',
+    description: 'Master optimization techniques for complex problems.',
+    difficulty: 'advanced',
+    estimatedTime: 600,
+    subtopics: [
+      {
+        id: 'dp-intro',
+        name: 'Introduction to Dynamic Programming',
+        content: 'Dynamic Programming is a method for solving complex problems by breaking them down into simpler subproblems. It typically applies to optimization problems.',
+        resources: [
+          {
+            id: 'dp-guide',
+            type: 'article',
+            title: 'Complete DP Guide',
+            source: 'Embedded Guide',
+            url: '/resources/notes/dsa-dp',
+            difficulty: 'advanced'
           }
         ],
         problems: [],

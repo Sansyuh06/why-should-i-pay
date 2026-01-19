@@ -11,11 +11,15 @@ import { allIntegratedProblems } from '@/lib/integratedCatalog';
 // Helper to count problems
 const getProblemCount = (topicId: string) => {
   const categoryMap: Record<string, string[]> = {
-    'arrays': ['Array', 'String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hashmap', 'Intervals'],
-    'linked-lists': ['Linked List'],
-    'trees': ['Binary Tree', 'BST', 'Tree'],
-    'graphs': ['Graph', 'BFS', 'DFS'],
-    'dynamic-programming': ['DP']
+    'arrays-101': ['Array', 'String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hashmap', 'Intervals'],
+    'linkedlist-101': ['Linked List'],
+    'stack-queue': ['Stack', 'Queue'],
+    'trees-101': ['Binary Tree', 'BST', 'Tree'],
+    'graphs-101': ['Graph', 'BFS', 'DFS'],
+    'sorting-101': ['Sort', 'Sorting'],
+    'searching-101': ['Binary Search', 'Search'],
+    'hashing-101': ['Hash Table', 'Hash Map'],
+    'dp-101': ['Dynamic Programming', 'DP']
   };
 
   const keywords = categoryMap[topicId] || [];
@@ -27,39 +31,25 @@ const getProblemCount = (topicId: string) => {
 };
 
 export default function LearnPage() {
-  const [dsaTopics, setDsaTopics] = useState<any[]>([]);
   const [learningPaths, setLearningPaths] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadPaths = async () => {
       try {
-        const { dsaTopics: topics, learningPaths: paths } = await import('@/lib/courseContent');
-
-        if(!topics || !Array.isArray(topics) || topics.length === 0) {
-          setError('No learning content available. Please try again later.');
-          console.error('[v0] Course topics data is empty or invalid');
-          return;
+        const { learningPaths: paths } = await import('@/lib/courseContent');
+        if(paths && Array.isArray(paths)) {
+          setLearningPaths(paths);
         }
-
-        if(!paths || !Array.isArray(paths)) {
-          console.warn('[v0] Learning paths data is invalid');
-        }
-
-        setDsaTopics(topics || []);
-        setLearningPaths(paths || []);
       } catch(error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to load course content';
-        console.error('[v0] Error loading course content:', error);
-        setError(errorMessage);
+        console.error('Failed to load learning paths', error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    loadData();
+    loadPaths();
   }, []);
 
   const filteredTopics = selectedDifficulty
@@ -179,13 +169,13 @@ export default function LearnPage() {
                 <div className="flex items-start justify-between mb-4 gap-4">
                   <div className="flex-1">
                     <h3 className="text-xl md:text-2xl font-black mb-2 group-hover:translate-x-2 transition-transform duration-300">
-                      {topic.title}
+                      {topic.name}
                     </h3>
                     <p className="text-sm md:text-base text-muted-foreground">{topic.description}</p>
                   </div>
-                  <span className={`px-3 md:px-4 py-1 md:py-2 text-xs font-bold rounded-full whitespace-nowrap flex-shrink-0 ${topic.difficulty === 'Beginner'
+                  <span className={`px-3 md:px-4 py-1 md:py-2 text-xs font-bold rounded-full whitespace-nowrap flex-shrink-0 ${topic.difficulty === 'beginner'
                     ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                    : topic.difficulty === 'Intermediate'
+                    : topic.difficulty === 'intermediate'
                       ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
                       : 'bg-red-500/10 text-red-600 dark:text-red-400'
                     }`}>
@@ -196,7 +186,7 @@ export default function LearnPage() {
                 <div className="grid grid-cols-3 gap-4 md:gap-6 mt-6 pt-6 border-t border-border/20">
                   <div>
                     <div className="text-xs text-muted-foreground mb-1">Estimated Hours</div>
-                    <div className="text-lg md:text-xl font-black">{topic.estimatedHours || 0}h</div>
+                    <div className="text-lg md:text-xl font-black">{Math.round((topic.estimatedTime || 0) / 60)}h</div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground mb-1">Subtopics</div>
@@ -204,7 +194,7 @@ export default function LearnPage() {
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground mb-1">Problems</div>
-                    <div className="text-lg md:text-xl font-black">{getProblemCount(topic.id) || topic.problems?.length || 0}</div>
+                    <div className="text-lg md:text-xl font-black">{getProblemCount(topic.id)}</div>
                   </div>
                 </div>
               </div>
@@ -267,8 +257,8 @@ export default function LearnPage() {
               href={`/quizzes?id=${quiz.id}`}
               className="p-4 border border-border/20 hover:border-accent transition-colors block"
             >
-              <span className={`text-xs px-2 py-0.5 rounded mb-2 inline-block ${quiz.difficulty === 'beginner' || quiz.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
-                quiz.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+              <span className={`text-xs px-2 py-0.5 rounded mb-2 inline-block ${quiz.difficulty?.toLowerCase() === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                quiz.difficulty?.toLowerCase() === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
                   'bg-red-500/20 text-red-400'
                 }`}>
                 {quiz.difficulty}
