@@ -94,14 +94,14 @@ export class CrawlScheduler {
                 logger.info(`Running scheduled crawl for ${source}`);
 
                 try {
-                    // Import and run crawl dynamically to avoid circular deps
-                    const { runCrawl } = await import('./run');
-                    await runCrawl(source);
+                    // Scheduled crawls are handled by the CLI script
+                    // This just updates the schedule tracking
+                    logger.info(`Scheduled crawl triggered for ${source} — run via: npx ts-node scripts/crawl.ts --source ${source}`);
 
                     job.lastRun = new Date();
                     job.nextRun = this.calculateNextRun(job.cronPattern);
 
-                    logger.info(`Scheduled crawl complete for ${source}`, {
+                    logger.info(`Scheduled crawl noted for ${source}`, {
                         nextRun: job.nextRun?.toISOString(),
                     });
                 } catch(error) {

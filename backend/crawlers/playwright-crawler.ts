@@ -122,7 +122,7 @@ export class PlaywrightCrawler implements CrawlerInterface {
             const content = await page.evaluate(() => {
                 // Remove non-content elements
                 const elementsToRemove = document.querySelectorAll('script, style, noscript, iframe, nav, footer, header');
-                elementsToRemove.forEach(el => el.remove());
+                elementsToRemove.forEach((el: Element) => el.remove());
                 return document.body?.innerText || '';
             });
 
