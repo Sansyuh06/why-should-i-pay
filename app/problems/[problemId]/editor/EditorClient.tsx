@@ -1,47 +1,144 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { sampleProblems } from '@/lib/data';
 import { allProblems } from '@/lib/problemCatalog';
 import { problemContent } from '@/lib/problemContent';
 import { ProblemNotFoundState } from '@/components/error-states';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Play, Copy, Check, ExternalLink } from 'lucide-react';
+import { Play, Copy, Check, ExternalLink, Send, Loader2, RotateCcw, ChevronDown } from 'lucide-react';
 
-const codeTemplates: Record<string, string> = {
-    javascript: `function solve(input) {
+// Dynamically import Monaco to avoid SSR issues
+const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
+
+// ─── Language Config ────────────────────────────────────────────────
+interface LangConfig {
+    id: string;
+    label: string;
+    monacoLang: string;
+    pistonLang: string;
+    pistonVersion: string;
+    template: string;
+}
+
+const languages: LangConfig[] = [
+    {
+        id: 'javascript',
+        label: 'JavaScript',
+        monacoLang: 'javascript',
+        pistonLang: 'javascript',
+        pistonVersion: '18.15.0',
+        template: `// JavaScript Solution
+function solve(input) {
   // Write your solution here
-  
+
   return output;
-}`,
-    python: `def solve(input):
+}
+
+// Example usage:
+console.log(solve([2, 7, 11, 15]));`,
+    },
+    {
+        id: 'python',
+        label: 'Python',
+        monacoLang: 'python',
+        pistonLang: 'python',
+        pistonVersion: '3.10.0',
+        template: `# Python Solution
+def solve(input_data):
     # Write your solution here
-    
-    return output`,
-    java: `public class Solution {
-    public void solve() {
+
+    return output
+
+# Example usage:
+print(solve([2, 7, 11, 15]))`,
+    },
+    {
+        id: 'java',
+        label: 'Java',
+        monacoLang: 'java',
+        pistonLang: 'java',
+        pistonVersion: '15.0.2',
+        template: `public class Main {
+    public static void main(String[] args) {
         // Write your solution here
+        System.out.println("Hello, World!");
     }
 }`,
-    cpp: `#include <iostream>
+    },
+    {
+        id: 'cpp',
+        label: 'C++',
+        monacoLang: 'cpp',
+        pistonLang: 'c++',
+        pistonVersion: '10.2.0',
+        template: `#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
 int main() {
     // Write your solution here
-    
+    cout << "Hello, World!" << endl;
     return 0;
 }`,
-    csharp: `public class Solution {
-    public void Solve() {
-        // Write your solution here
-    }
-}`
-};
+    },
+    {
+        id: 'csharp',
+        label: 'C#',
+        monacoLang: 'csharp',
+        pistonLang: 'csharp',
+        pistonVersion: '6.12.0',
+        template: `using System;
 
+class Program {
+    static void Main(string[] args) {
+        // Write your solution here
+        Console.WriteLine("Hello, World!");
+    }
+}`,
+    },
+];
+
+// ─── Local API Execution ───────────────────────────────────────────
+async function executeCode(language: string, version: string, code: string, stdin: string = ''): Promise<{ output: string; error: string; exitCode: number }> {
+    try {
+        const response = await fetch('/api/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                language,
+                code,
+                stdin,
+            }),
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || `API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+            output: data.output || '',
+            error: data.error || '',
+            exitCode: data.exitCode ?? 0,
+        };
+    } catch (err: any) {
+        return {
+            output: '',
+            error: `Execution failed: ${err.message}\n\nTip: Make sure you have the required compiler/runtime (Node, Python, GCC, Java, etc.) installed on your local machine.`,
+            exitCode: 1,
+        };
+    }
+}
+
+// ─── Component ──────────────────────────────────────────────────────
 export function EditorClient({ problemId }: { problemId: string }) {
-    // Data Resolution Logic
+    // Data Resolution
     const sampleProblem = sampleProblems.find(p => p.id === problemId);
     const manualContent = problemContent[problemId];
     const catalogProblem = allProblems.find(p => p.id === problemId);
@@ -49,48 +146,100 @@ export function EditorClient({ problemId }: { problemId: string }) {
     let problem: any = sampleProblem;
     let hasContent = true;
 
-    if(!problem && manualContent && catalogProblem) {
+    if (!problem && manualContent && catalogProblem) {
         problem = { ...catalogProblem, ...manualContent, acceptance: 85 };
-    } else if(!problem && catalogProblem) {
+    } else if (!problem && catalogProblem) {
         problem = { ...catalogProblem, description: null, examples: [], constraints: [], acceptance: 0 };
         hasContent = false;
     }
 
-    const [language, setLanguage] = useState<string>('javascript');
-    const [code, setCode] = useState(codeTemplates.javascript);
+    const [langIdx, setLangIdx] = useState(0);
+    const [code, setCode] = useState(languages[0].template);
     const [output, setOutput] = useState<string>('');
     const [isRunning, setIsRunning] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'submitted' | 'accepted'>('idle');
+    const [executionTime, setExecutionTime] = useState<number | null>(null);
+    const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
     const [copied, setCopied] = useState(false);
+    const [stdin, setStdin] = useState('');
+    const [showStdin, setShowStdin] = useState(false);
+    const editorRef = useRef<any>(null);
 
-    if(!problem) {
+    if (!problem) {
         const suggestedProblems = allProblems.filter(p => p.id !== problemId).slice(0, 3);
         return <ProblemNotFoundState problemId={problemId} suggestedProblems={suggestedProblems} />;
     }
 
-    const handleLanguageChange = (newLang: string) => {
-        setLanguage(newLang);
-        setCode(codeTemplates[newLang as keyof typeof codeTemplates] || '');
+    const currentLang = languages[langIdx];
+
+    const handleLanguageChange = (idx: number) => {
+        setLangIdx(idx);
+        setCode(languages[idx].template);
+        setOutput('');
+        setStatus('idle');
+        setExecutionTime(null);
     };
 
-    const handleRunCode = async () => {
-        setIsRunning(true);
-        // Simulate code execution
-        setTimeout(() => {
-            setOutput(`Execution output:\n✓ Compiled successfully\n→ All test cases passed!\n\nExecution time: 45ms\nMemory used: 12.3 MB`);
-            setStatus('accepted');
-            setIsRunning(false);
-        }, 1500);
+    const handleEditorMount = (editor: any) => {
+        editorRef.current = editor;
+        editor.focus();
     };
 
-    const handleSubmit = () => {
+    const handleRunCode = useCallback(async () => {
         setIsRunning(true);
-        setTimeout(() => {
-            setStatus('submitted');
-            setOutput('✅ Accepted! Your solution is correct.\n\nExecution time: 45ms (beats 95% of submissions)\nMemory: 12.3MB (beats 87% of submissions)');
-            setIsRunning(false);
-        }, 2000);
-    };
+        setStatus('running');
+        setOutput('⏳ Compiling and executing...');
+        const start = performance.now();
+
+        const result = await executeCode(currentLang.pistonLang, currentLang.pistonVersion, code, stdin);
+        const elapsed = Math.round(performance.now() - start);
+        setExecutionTime(elapsed);
+
+        if (result.exitCode !== 0 || result.error) {
+            setStatus('error');
+            setOutput(
+                (result.error ? `❌ Error:\n${result.error}\n` : '') +
+                (result.output ? `\nOutput:\n${result.output}` : '')
+            );
+        } else {
+            setStatus('success');
+            setOutput(
+                `✅ Execution successful (${elapsed}ms)\n\n` +
+                `Output:\n${result.output || '(no output)'}`
+            );
+        }
+
+        setIsRunning(false);
+    }, [code, currentLang, stdin]);
+
+    const handleSubmit = useCallback(async () => {
+        setIsRunning(true);
+        setStatus('running');
+        setOutput('📤 Submitting solution...');
+        const start = performance.now();
+
+        const result = await executeCode(currentLang.pistonLang, currentLang.pistonVersion, code, stdin);
+        const elapsed = Math.round(performance.now() - start);
+        setExecutionTime(elapsed);
+
+        if (result.exitCode !== 0 || result.error) {
+            setStatus('error');
+            setOutput(
+                `❌ Submission Failed\n\n` +
+                (result.error ? `Error:\n${result.error}\n` : '') +
+                (result.output ? `Output:\n${result.output}` : '')
+            );
+        } else {
+            setStatus('success');
+            setOutput(
+                `✅ Accepted!\n\n` +
+                `Execution time: ${elapsed}ms\n` +
+                `Language: ${currentLang.label}\n\n` +
+                `Output:\n${result.output || '(no output)'}`
+            );
+        }
+
+        setIsRunning(false);
+    }, [code, currentLang, stdin]);
 
     const handleCopyCode = () => {
         navigator.clipboard.writeText(code);
@@ -98,12 +247,19 @@ export function EditorClient({ problemId }: { problemId: string }) {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleResetCode = () => {
+        setCode(currentLang.template);
+        setOutput('');
+        setStatus('idle');
+        setExecutionTime(null);
+    };
+
     return (
         <div className="min-h-screen bg-background pt-20">
             {/* Header */}
             <div className="border-b border-border py-6 px-4 sm:px-6 lg:px-8 bg-card/50">
                 <div className="max-w-7xl mx-auto">
-                    <Link href="/problems" className="text-primary hover:underline mb-4 inline-block">
+                    <Link href="/problems" className="text-primary hover:underline mb-4 inline-block text-sm">
                         ← Back to Problems
                     </Link>
                     <h1 className="text-3xl font-bold">{problem.title}</h1>
@@ -112,9 +268,8 @@ export function EditorClient({ problemId }: { problemId: string }) {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid lg:grid-cols-2 gap-8">
-                    {/* Left - Problem Details */}
+                    {/* Left — Problem Details */}
                     <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-200px)]">
-                        {/* Problem Info */}
                         <Card className="p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <span className={`font-bold px-3 py-1 rounded text-sm ${problem.difficulty === 'easy'
@@ -204,94 +359,157 @@ export function EditorClient({ problemId }: { problemId: string }) {
                         </Card>
                     </div>
 
-                    {/* Right - Code Editor */}
+                    {/* Right — Code Editor */}
                     <div className="space-y-4">
                         {/* Language Selector */}
                         <Card className="p-4">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-bold">Select Language</h3>
-                            </div>
-                            <div className="grid grid-cols-3 gap-2">
-                                {Object.keys(codeTemplates).map(lang => (
+                                <h3 className="font-bold text-sm">Select Language</h3>
+                                <div className="flex items-center gap-2">
                                     <button
-                                        key={lang}
-                                        onClick={() => handleLanguageChange(lang)}
-                                        className={`py-2 px-3 rounded text-sm font-medium transition ${language === lang
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'bg-muted hover:bg-muted/80'
+                                        onClick={handleResetCode}
+                                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition"
+                                        title="Reset code"
+                                    >
+                                        <RotateCcw className="w-3.5 h-3.5" />
+                                        Reset
+                                    </button>
+                                    <button
+                                        onClick={handleCopyCode}
+                                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition"
+                                    >
+                                        {copied ? (
+                                            <><Check className="w-3.5 h-3.5" /> Copied</>
+                                        ) : (
+                                            <><Copy className="w-3.5 h-3.5" /> Copy</>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {languages.map((lang, idx) => (
+                                    <button
+                                        key={lang.id}
+                                        onClick={() => handleLanguageChange(idx)}
+                                        className={`py-2 px-4 rounded text-sm font-medium transition-all ${langIdx === idx
+                                            ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20'
+                                            : 'bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground'
                                             }`}
                                     >
-                                        {lang}
+                                        {lang.label}
                                     </button>
                                 ))}
                             </div>
                         </Card>
 
-                        {/* Code Editor */}
-                        <Card className="p-4 flex flex-col h-96">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-bold">Code</span>
-                                <button
-                                    onClick={handleCopyCode}
-                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-                                >
-                                    {copied ? (
-                                        <>
-                                            <Check className="w-4 h-4" />
-                                            Copied
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Copy className="w-4 h-4" />
-                                            Copy
-                                        </>
-                                    )}
-                                </button>
+                        {/* Monaco Editor */}
+                        <Card className="overflow-hidden border border-border">
+                            <div className="flex items-center justify-between px-4 py-2 bg-muted/50 border-b border-border">
+                                <span className="text-xs font-mono text-muted-foreground">
+                                    {currentLang.label} • solution.{currentLang.id === 'python' ? 'py' : currentLang.id === 'cpp' ? 'cpp' : currentLang.id === 'csharp' ? 'cs' : currentLang.id === 'java' ? 'java' : 'js'}
+                                </span>
+                                {executionTime !== null && (
+                                    <span className="text-xs text-muted-foreground">
+                                        Last run: {executionTime}ms
+                                    </span>
+                                )}
                             </div>
-                            <textarea
+                            <Editor
+                                height="400px"
+                                language={currentLang.monacoLang}
                                 value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                className="flex-1 p-4 bg-muted rounded font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="Write your code here..."
+                                onChange={(val) => setCode(val || '')}
+                                onMount={handleEditorMount}
+                                theme="vs-dark"
+                                options={{
+                                    fontSize: 14,
+                                    fontFamily: "'Geist Mono', 'Fira Code', 'Consolas', monospace",
+                                    minimap: { enabled: false },
+                                    scrollBeyondLastLine: false,
+                                    padding: { top: 16, bottom: 16 },
+                                    lineNumbers: 'on',
+                                    renderLineHighlight: 'all',
+                                    automaticLayout: true,
+                                    tabSize: 4,
+                                    wordWrap: 'on',
+                                    suggestOnTriggerCharacters: true,
+                                    quickSuggestions: true,
+                                    bracketPairColorization: { enabled: true },
+                                    cursorBlinking: 'smooth',
+                                    cursorSmoothCaretAnimation: 'on',
+                                    smoothScrolling: true,
+                                }}
                             />
                         </Card>
 
-                        {/* Buttons */}
+                        {/* Stdin Toggle */}
+                        <button
+                            onClick={() => setShowStdin(!showStdin)}
+                            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition"
+                        >
+                            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showStdin ? 'rotate-180' : ''}`} />
+                            Custom Input (stdin)
+                        </button>
+                        {showStdin && (
+                            <Card className="p-3">
+                                <textarea
+                                    value={stdin}
+                                    onChange={(e) => setStdin(e.target.value)}
+                                    placeholder="Enter custom input here..."
+                                    className="w-full h-20 bg-muted rounded p-3 font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-accent text-foreground placeholder:text-muted-foreground"
+                                />
+                            </Card>
+                        )}
+
+                        {/* Action Buttons */}
                         <div className="flex gap-3">
                             <Button
-                                className="flex-1 bg-transparent"
+                                className="flex-1 bg-transparent border-accent/50 hover:bg-accent/10 hover:border-accent"
                                 variant="outline"
                                 onClick={handleRunCode}
                                 disabled={isRunning}
                             >
-                                <Play className="w-4 h-4 mr-2" />
-                                {isRunning ? 'Running...' : 'Run Code'}
+                                {isRunning ? (
+                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Running...</>
+                                ) : (
+                                    <><Play className="w-4 h-4 mr-2" /> Run Code</>
+                                )}
                             </Button>
                             <Button
-                                className="flex-1"
+                                className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
                                 onClick={handleSubmit}
                                 disabled={isRunning}
                             >
-                                Submit Solution
+                                {isRunning ? (
+                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...</>
+                                ) : (
+                                    <><Send className="w-4 h-4 mr-2" /> Submit</>
+                                )}
                             </Button>
                         </div>
 
                         {/* Output */}
-                        <Card className="p-4 flex flex-col">
+                        <Card className="p-4">
                             <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-bold">Output</h4>
-                                {status === 'accepted' && (
+                                <h4 className="font-bold text-sm">Output</h4>
+                                {status === 'success' && (
                                     <span className="px-2 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-bold">
-                                        ✓ Accepted
+                                        ✓ Success
                                     </span>
                                 )}
-                                {status === 'submitted' && (
-                                    <span className="px-2 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-bold">
-                                        Submitted
+                                {status === 'error' && (
+                                    <span className="px-2 py-1 rounded-full bg-red-500/10 text-red-500 text-xs font-bold">
+                                        ✗ Error
+                                    </span>
+                                )}
+                                {status === 'running' && (
+                                    <span className="px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-bold flex items-center gap-1">
+                                        <Loader2 className="w-3 h-3 animate-spin" /> Running
                                     </span>
                                 )}
                             </div>
-                            <pre className="bg-muted p-3 rounded text-sm overflow-auto text-muted-foreground font-mono whitespace-pre-wrap break-words">
+                            <pre className={`bg-muted p-4 rounded text-sm overflow-auto max-h-64 font-mono whitespace-pre-wrap break-words ${status === 'error' ? 'text-red-400' : status === 'success' ? 'text-green-400' : 'text-muted-foreground'
+                                }`}>
                                 {output || 'Output will appear here after running your code'}
                             </pre>
                         </Card>

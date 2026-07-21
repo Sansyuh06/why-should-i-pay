@@ -5,6 +5,17 @@ import { Navigation, Footer } from '@/components/navigation';
 import { youtubeResources, gfgQuizzes, gfgTutorials, interactivePlatforms, resourceStats, stlResources, externalCollections } from '@/lib/learningResources';
 
 export default function ResourcesPage() {
+    // Helper to get YouTube embed URLs
+    const getEmbedUrl = (url: string) => {
+        if (url.includes('youtube.com/watch?v=')) {
+            return url.replace('watch?v=', 'embed/');
+        }
+        if (url.includes('youtube.com/playlist?list=')) {
+            return url.replace('playlist?list=', 'embed/videoseries?list=');
+        }
+        return url;
+    };
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Navigation />
@@ -17,9 +28,9 @@ export default function ResourcesPage() {
                 </p>
             </section>
 
-            {/* Premier Collections */}
+            {/* Premier Collections (Curriculums) */}
             <section className="py-8 px-6 md:px-12 border-t border-border/20">
-                <h2 className="text-xl font-bold mb-6 text-accent">Premier Collections</h2>
+                <h2 className="text-xl font-bold mb-6 text-accent">Curriculums & Roadmaps</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                     {externalCollections.map((col) => (
                         <a
@@ -27,13 +38,13 @@ export default function ResourcesPage() {
                             href={col.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-6 border border-border/20 hover:border-accent transition-colors bg-muted/5"
+                            className="p-6 border border-border/20 hover:border-accent transition-all hover:-translate-y-1 bg-card rounded-lg shadow-lg"
                         >
-                            <h3 className="font-bold mb-2">{col.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-4">{col.description}</p>
+                            <h3 className="text-lg font-bold mb-2 text-foreground">{col.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{col.description}</p>
                             <div className="flex flex-wrap gap-2">
                                 {col.tags.map((t, i) => (
-                                    <span key={i} className="text-xs px-2 py-1 bg-accent/10 text-accent rounded">{t}</span>
+                                    <span key={i} className="text-xs px-2 py-1 bg-accent/20 text-accent rounded-full font-medium">{t}</span>
                                 ))}
                             </div>
                         </a>
@@ -41,25 +52,29 @@ export default function ResourcesPage() {
                 </div>
             </section>
 
-            {/* YouTube Videos */}
+            {/* YouTube Videos (Embedded) */}
             <section className="py-12 px-8 md:px-16 border-t border-border/20">
-                <h2 className="text-xl font-bold mb-6">YouTube Videos & Playlists</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <h2 className="text-xl font-bold mb-6">Video Library</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {youtubeResources.map((video) => (
-                        <a
-                            key={video.id}
-                            href={video.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-4 border border-border/20 hover:border-accent transition-colors"
-                        >
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-accent">▶</span>
-                                <span className="text-xs text-muted-foreground uppercase">{video.type}</span>
+                        <div key={video.id} className="flex flex-col border border-border/20 rounded-lg overflow-hidden bg-card">
+                            <div className="aspect-video w-full">
+                                <iframe
+                                    src={getEmbedUrl(video.url)}
+                                    title={video.title}
+                                    className="w-full h-full border-0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                />
                             </div>
-                            <h3 className="font-medium mb-1">{video.title}</h3>
-                            <p className="text-sm text-muted-foreground">{video.topic} • {video.language}</p>
-                        </a>
+                            <div className="p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-xs px-2 py-0.5 bg-accent/10 text-accent rounded uppercase font-medium">{video.type}</span>
+                                </div>
+                                <h3 className="font-bold mb-1 text-foreground line-clamp-1" title={video.title}>{video.title}</h3>
+                                <p className="text-sm text-muted-foreground">{video.topic} • {video.language}</p>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </section>

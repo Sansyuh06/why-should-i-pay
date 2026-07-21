@@ -34,6 +34,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+import { Providers } from '@/components/Providers'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,7 +44,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased min-h-screen bg-background text-foreground">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

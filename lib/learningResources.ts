@@ -177,6 +177,34 @@ export const externalCollections = [
         description: 'Essential problems for interviews (External)',
         tags: ['LeetCode', 'Interview', 'Standard']
     },
+    {
+        id: 'algomap-roadmap',
+        title: "AlgoMap Roadmap",
+        url: 'https://algomap.io/roadmap',
+        description: 'Comprehensive roadmap for DSA algorithms and problem-solving.',
+        tags: ['DSA', 'Roadmap', 'Algorithms']
+    },
+    {
+        id: 'sde-notion-roadmap',
+        title: "10 Months SDE Roadmap",
+        url: 'https://www.notion.so/SDE-ROADMAP-10-MONTHS-11c7e51ba89380f2b309d10c7bbf58ab',
+        description: 'Step-by-step Software Development Engineer roadmap on Notion.',
+        tags: ['SDE', 'Roadmap', 'Notion']
+    },
+    {
+        id: 'deeplearning-ai',
+        title: "DeepLearning.AI",
+        url: 'https://www.deeplearning.ai/',
+        description: 'World-class AI education from Andrew Ng. Master AI, ML, and Deep Learning.',
+        tags: ['AI', 'Machine Learning', 'Gen AI']
+    },
+    {
+        id: 'instabyte-100',
+        title: "Interview Master 100",
+        url: 'https://instabyte.io/p/interview-master-100',
+        description: 'Top 100 handpicked interview questions to crack product-based companies.',
+        tags: ['Interview', 'Questions', 'Preparation']
+    },
 ];
 
 // ============================================

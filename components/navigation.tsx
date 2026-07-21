@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Search, BookOpen, Code, FileQuestion, LayoutDashboard, Map, Users, Terminal, Library } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Menu, X, Search, BookOpen, Code, FileQuestion, LayoutDashboard, Map, Users, Terminal, Library, Building2, Compass, Brain, LogOut } from 'lucide-react';
 
 const navLinks = [
   { href: '/learn', label: 'Learn', icon: BookOpen },
   { href: '/problems', label: 'Problems', icon: Code },
+  { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/guides', label: 'Guides', icon: Compass },
+  { href: '/interview-prep', label: 'Interview', icon: Brain },
   { href: '/quizzes', label: 'Quizzes', icon: FileQuestion },
   { href: '/resources', label: 'Resources', icon: Library },
   { href: '/ide', label: 'IDE', icon: Terminal },
@@ -17,6 +21,7 @@ const navLinks = [
 
 export function Navigation() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -57,6 +62,23 @@ export function Navigation() {
           >
             <Search className="w-4 h-4" />
           </button>
+
+          {/* Auth State */}
+          <div className="hidden md:flex items-center gap-4 border-l border-border/40 pl-4 ml-2">
+            {session ? (
+              <div className="flex items-center gap-4">
+                <span className="text-xs text-muted-foreground">Hi, {session.user?.name || session.user?.email?.split('@')[0]}</span>
+                <button onClick={() => signOut()} className="text-xs text-muted-foreground hover:text-accent transition flex items-center gap-1">
+                  <LogOut className="w-3 h-3" />
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="text-xs font-medium px-4 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition">
+                Sign In
+              </Link>
+            )}
+          </div>
 
           {/* Mobile Menu Toggle */}
           <button
@@ -154,13 +176,16 @@ export function Footer() {
             <div className="text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 text-muted-foreground">Practice</div>
             <ul className="space-y-2 md:space-y-3">
               <li><Link href="/problems" className="text-xs text-muted-foreground hover:text-foreground transition">Problems</Link></li>
+              <li><Link href="/companies" className="text-xs text-muted-foreground hover:text-foreground transition">Companies</Link></li>
               <li><Link href="/quizzes" className="text-xs text-muted-foreground hover:text-foreground transition">Quizzes</Link></li>
               <li><Link href="/ide" className="text-xs text-muted-foreground hover:text-foreground transition">IDE</Link></li>
             </ul>
           </div>
           <div>
-            <div className="text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 text-muted-foreground">Progress</div>
+            <div className="text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 text-muted-foreground">Prepare</div>
             <ul className="space-y-2 md:space-y-3">
+              <li><Link href="/guides" className="text-xs text-muted-foreground hover:text-foreground transition">Guides</Link></li>
+              <li><Link href="/interview-prep" className="text-xs text-muted-foreground hover:text-foreground transition">Interview Prep</Link></li>
               <li><Link href="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition">Dashboard</Link></li>
               <li><Link href="/roadmaps" className="text-xs text-muted-foreground hover:text-foreground transition">Learning Paths</Link></li>
             </ul>
