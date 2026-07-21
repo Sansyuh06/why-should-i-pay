@@ -87,7 +87,7 @@ export default function Home() {
                                 <br/><br/>
                                 <div className="text-violet-400 inline">const</div> <div className="text-slate-300 inline">result =</div> <div className="text-violet-400 inline">await</div> <div className="text-cyan-400 inline">DockerService</div><div className="text-slate-300 inline">.run({'{'}</div>
                                 <br/>
-                                <div className="pl-4 text-slate-300">image: <div className="text-green-400 inline">`code-runner-$\{language\}`</div>,</div>
+                                <div className="pl-4 text-slate-300">image: <div className="text-green-400 inline">{'`code-runner-${language}`'}</div>,</div>
                                 <div className="pl-4 text-slate-300">timeoutMs: <div className="text-orange-400 inline">5000</div>,</div>
                                 <div className="text-slate-300 inline">{'}'});</div>
                                 <br/><br/>

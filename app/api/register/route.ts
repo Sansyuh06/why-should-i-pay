@@ -1,4 +1,4 @@
-import { NextResponse } from "next-auth/next"; // No, it should be import { NextResponse } from "next/server";
+// import { NextResponse } from "next/server"; // Not used in this file
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 

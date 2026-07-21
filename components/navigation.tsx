@@ -135,43 +135,27 @@ export function Navigation() {
         </div>
       </div>
 
-        </div>
-      )}
-
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border/40">
-          <div className="px-6 py-6 space-y-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 text-sm transition ${isActive
-                      ? 'text-foreground bg-secondary/50 font-medium'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/30'
-                    }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {link.label}
-                </Link>
-              );
-            })}
-
-            {/* Mobile Search */}
-            <div className="pt-4 mt-4 border-t border-border/30">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full pl-12 pr-4 py-3 bg-secondary/50 border border-border/30 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-foreground transition"
-                />
-              </div>
-            </div>
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-[#020617] border-b border-slate-800/60 p-6 h-screen overflow-y-auto">
+          <div className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-mono uppercase tracking-widest text-slate-400 hover:text-cyan-400 flex items-center gap-3 py-3 border-b border-slate-800/50"
+              >
+                <link.icon className="w-4 h-4" />
+                {link.label}
+              </Link>
+            ))}
+            
+            {!session && (
+              <Link href="/login" className="mt-4 text-center text-xs font-bold font-mono tracking-wider px-5 py-3 bg-cyan-950/40 text-cyan-400 border border-cyan-900/50 rounded shadow-[0_0_15px_rgba(34,211,238,0.1)] hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:bg-cyan-900/40 transition-all">
+                SIGN IN
+              </Link>
+            )}
           </div>
         </div>
       )}
