@@ -1,10 +1,22 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Fraunces, Outfit, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const fraunces = Fraunces({ 
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+});
+
+const outfit = Outfit({ 
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
+
+const jetbrainsMono = JetBrains_Mono({ 
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
 
 export const metadata: Metadata = {
   title: 'Why Should I Pay - Free Coding Learning Platform',
@@ -43,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
+      <body className={`${fraunces.variable} ${outfit.variable} ${jetbrainsMono.variable} font-sans antialiased min-h-screen bg-background text-foreground`}>
         <Providers>
           {children}
         </Providers>

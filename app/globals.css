@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+@theme {
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-outfit);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /* Strictly Dark Black & Red theme */
