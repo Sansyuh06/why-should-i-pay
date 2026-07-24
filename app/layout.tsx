@@ -3,7 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import { Fraunces, Outfit, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
-const fraunces = Fraunces({ 
+const fraunces = Fraunces({
+  display: "swap", 
   subsets: ["latin"],
   variable: "--font-fraunces",
 });
