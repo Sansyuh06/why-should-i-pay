@@ -148,4 +148,4 @@ Open `http://localhost:3000` in your browser.
 
 ## License
 
-Use this repository for learning and development. Feel free to extend the platform with your own content and features.
+Use this repository for learning and development. Contributions are welcome. Feel free to extend the platform with your own content and features.
