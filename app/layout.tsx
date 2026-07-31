@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   keywords: ['DSA', 'algorithms', 'data structures', 'coding', 'programming', 'interview prep', 'free learning', 'offline'],
   authors: [{ name: 'Why Should I Pay' }],
+  robots: { index: true, follow: true },
   openGraph: {
     title: 'Why Should I Pay - Free Coding Learning Platform',
     description: 'Complete offline coding platform with 1000+ DSA problems, video tutorials, interactive IDE, quizzes, and learning roadmaps.',
