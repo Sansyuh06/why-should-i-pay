@@ -145,6 +145,7 @@ Open `http://localhost:3000` in your browser.
 - The platform is built to be used offline once installed.
 - All learning content is embedded in the repository.
 - No external APIs are required for the core experience.
+- PWA enabled for offline installation.
 
 ## License
 
