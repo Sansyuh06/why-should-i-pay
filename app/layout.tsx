@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     title: 'Why Should I Pay - Free Coding Learning Platform',
     description: 'Complete offline coding platform with 1000+ DSA problems, video tutorials, interactive IDE, quizzes, and learning roadmaps.',
     type: 'website',
+    siteName: 'Why Should I Pay',
   },
   twitter: {
     card: 'summary_large_image',
